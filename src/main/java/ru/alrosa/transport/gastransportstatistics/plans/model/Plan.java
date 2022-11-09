@@ -1,6 +1,8 @@
 package ru.alrosa.transport.gastransportstatistics.plans.model;
 
-import lombok.*;
+import lombok.Data;
+import ru.alrosa.transport.gastransportstatistics.subdivisions.model.Subdivision;
+import ru.alrosa.transport.gastransportstatistics.users.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -14,12 +16,14 @@ public class Plan {
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "user_id")
-    private Long UserId;
-    @Column(name = "subdivision_id", nullable = false)
-    private Long subdivisionId;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+    @ManyToOne
+    @JoinColumn(name = "subdivision_id", nullable = false)
+    private Subdivision subdivision;
     @Column(name = "creation_time", nullable = false)
-    private LocalDateTime creationTime;
+    private LocalDate creationTime;
     @Column(name = "period_start", nullable = false)
     private LocalDate periodStart;
     @Column(name = "period_end", nullable = false)

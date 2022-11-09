@@ -1,17 +1,18 @@
 package ru.alrosa.transport.gastransportstatistics.plans.services;
 
+import ru.alrosa.transport.gastransportstatistics.plans.dto.InfoPlanDto;
 import ru.alrosa.transport.gastransportstatistics.plans.dto.PlanDto;
 
 import java.util.Collection;
 
 public interface PlanService {
-    Collection<PlanDto> getAllPlanDto();
+    Collection<InfoPlanDto> getAllPlanDto();
 
-    PlanDto getPlanDtoById(Long planDtoId);
+    InfoPlanDto getPlanDtoById(Long planDtoId);
 
-    PlanDto updatePlanDto(PlanDto planDto);
+    InfoPlanDto updatePlanDto(PlanDto planDto);
 
-    PlanDto createPlanDto(PlanDto planDto);
+    InfoPlanDto createPlanDto(PlanDto planDto);
 
     void deletePlanDtoById(Long planDtoId);
 }

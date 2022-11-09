@@ -22,7 +22,8 @@ public class User {
     private String email;
     @Column(name = "login")
     private String login;
+    @OneToOne
     @JoinColumn(name = "subdivision_id")
-    private Long subdivisionId;
+    private Subdivision subdivision;
 }
 

@@ -2,6 +2,7 @@ package ru.alrosa.transport.gastransportstatistics.users.repositories;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -15,14 +16,21 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @Transactional
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @SpringJUnitConfig({GastransportstatisticsApplication.class, UserServiceImpl.class})
 class UserRepositoryTest {
 
-    private final EntityManager entityManager;
-    private final UserRepository userRepository;
+    private EntityManager entityManager;
+    private UserRepository userRepository;
+
+    @BeforeEach
+    void beforeEach() {
+        userRepository = mock(UserRepository.class);
+    }
 
     @Test
     void createUserTest() {
@@ -32,10 +40,11 @@ class UserRepositoryTest {
         user.setEmail("MartynkinIA@alrosa.ru");
         user.setLogin("MartynkinIA");
 
-        userRepository.save(user);
+        when(userRepository.save(user)).thenReturn(user);
 
         TypedQuery<User> query = entityManager.createQuery("Select u from User u where u.id = :id", User.class);
-        User queryUser = query
+
+                User queryUser = query
                 .setParameter("id", 1L)
                 .getSingleResult();
         assertEquals(user, queryUser);
