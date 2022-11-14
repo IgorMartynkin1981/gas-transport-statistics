@@ -19,14 +19,14 @@ public class SubdivisionController {
         this.subdivisionService = subdivisionService;
     }
 
-    @GetMapping("/{id}")
-    public SubdivisionDto getSubdivisionDtoById(@PathVariable Long id) {
-        return subdivisionService.getSubdivisionDtoById(id);
+    @GetMapping()
+    public Collection<SubdivisionDto> getSubdivisionDto() {
+        return subdivisionService.getAllSubdivisionDto();
     }
 
-    @GetMapping()
-    public Collection<SubdivisionDto> getSubdivisionDtoById() {
-        return subdivisionService.getAllSubdivisionDto();
+    @GetMapping("/subdivision/{id}")
+    public SubdivisionDto getSubdivisionDtoById(@PathVariable Long id) {
+        return subdivisionService.getSubdivisionDtoById(id);
     }
 
     @PostMapping

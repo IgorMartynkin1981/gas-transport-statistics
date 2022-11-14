@@ -25,5 +25,9 @@ public class User {
     @OneToOne
     @JoinColumn(name = "subdivision_id")
     private Subdivision subdivision;
+    @Column(name = "user_password")
+    private String userPassword;
+    @Column(name = "api_token")
+    private String apiToken;
 }
 
