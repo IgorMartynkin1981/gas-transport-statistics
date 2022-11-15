@@ -10,7 +10,6 @@ import ru.alrosa.transport.gastransportstatistics.users.dto.InfoUserDto;
 import ru.alrosa.transport.gastransportstatistics.users.dto.UserDto;
 import ru.alrosa.transport.gastransportstatistics.users.services.UserService;
 
-import javax.validation.Valid;
 import java.util.Collection;
 
 @RestController

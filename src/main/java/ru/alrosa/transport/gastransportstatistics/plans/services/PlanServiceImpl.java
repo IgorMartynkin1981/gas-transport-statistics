@@ -8,6 +8,7 @@ import ru.alrosa.transport.gastransportstatistics.plans.dto.PlanDto;
 import ru.alrosa.transport.gastransportstatistics.plans.dto.PlanMapper;
 import ru.alrosa.transport.gastransportstatistics.plans.model.Plan;
 import ru.alrosa.transport.gastransportstatistics.plans.repositories.PlanRepository;
+import ru.alrosa.transport.gastransportstatistics.serializationdeserialization.UtilClass;
 import ru.alrosa.transport.gastransportstatistics.users.model.User;
 import ru.alrosa.transport.gastransportstatistics.users.repositories.UserRepository;
 
@@ -27,8 +28,20 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
-    public Collection<InfoPlanDto> getAllPlanDto() {
-        return planRepository.findAll().stream().map(PlanMapper::toInfoPlanDto).toList();
+    public Collection<InfoPlanDto> getAllPlanDto(Long subdivisionId, String periodStart, String periodEnd) {
+        if (subdivisionId != 0) {
+            return planRepository.findAllByPeriodStartAfterAndPeriodEndBefore(subdivisionId, UtilClass.toLocalDateTime(periodStart),
+                            UtilClass.toLocalDateTime(periodEnd))
+                    .stream()
+                    .map(PlanMapper::toInfoPlanDto)
+                    .toList();
+        } else {
+            return planRepository.findAllByPeriodStartAfterAndPeriodEndBefore(UtilClass.toLocalDateTime(periodStart),
+                            UtilClass.toLocalDateTime(periodEnd))
+                    .stream()
+                    .map(PlanMapper::toInfoPlanDto)
+                    .toList();
+        }
     }
 
     @Override
@@ -38,7 +51,8 @@ public class PlanServiceImpl implements PlanService {
 
     @Override
     public InfoPlanDto updatePlanDto(PlanDto planDto) {
-        return null;
+        Plan plan = findAndVerifyPlanInRepository(planDto.getId());
+        return PlanMapper.toInfoPlanDto(planRepository.save(PlanMapper.toPlan(planDto, plan.getUser())));
     }
 
     @Override
@@ -51,7 +65,7 @@ public class PlanServiceImpl implements PlanService {
 
     @Override
     public void deletePlanDtoById(Long planDtoId) {
-
+        planRepository.deleteById(planDtoId);
     }
 
     private Plan findAndVerifyPlanInRepository(Long planId) {

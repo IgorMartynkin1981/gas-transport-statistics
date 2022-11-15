@@ -6,7 +6,7 @@ import ru.alrosa.transport.gastransportstatistics.plans.dto.PlanDto;
 import java.util.Collection;
 
 public interface PlanService {
-    Collection<InfoPlanDto> getAllPlanDto();
+    Collection<InfoPlanDto> getAllPlanDto(Long subdivisionId, String periodStart, String periodEnd);
 
     InfoPlanDto getPlanDtoById(Long planDtoId);
 
