@@ -11,6 +11,7 @@ import ru.alrosa.transport.gastransportstatistics.subdivisions.repositories.Subd
 
 import javax.validation.Valid;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 @Service
 public class SubdivisionServiceImpl implements SubdivisionService {
@@ -24,7 +25,8 @@ public class SubdivisionServiceImpl implements SubdivisionService {
 
     @Override
     public Collection<SubdivisionDto> getAllSubdivisionDto() {
-        return subdivisionRepository.findAll().stream().map(SubdivisionMapper::toSubdivisionDto).toList();
+        return subdivisionRepository.findAll().stream().map(SubdivisionMapper::toSubdivisionDto)
+                .collect(Collectors.toList());
     }
 
     @Override

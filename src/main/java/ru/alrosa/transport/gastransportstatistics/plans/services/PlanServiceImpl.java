@@ -13,6 +13,7 @@ import ru.alrosa.transport.gastransportstatistics.users.model.User;
 import ru.alrosa.transport.gastransportstatistics.users.repositories.UserRepository;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 @Service
 public class PlanServiceImpl implements PlanService {
@@ -34,13 +35,13 @@ public class PlanServiceImpl implements PlanService {
                             UtilClass.toLocalDateTime(periodEnd))
                     .stream()
                     .map(PlanMapper::toInfoPlanDto)
-                    .toList();
+                    .collect(Collectors.toList());
         } else {
             return planRepository.findAllByPeriodStartAfterAndPeriodEndBefore(UtilClass.toLocalDateTime(periodStart),
                             UtilClass.toLocalDateTime(periodEnd))
                     .stream()
                     .map(PlanMapper::toInfoPlanDto)
-                    .toList();
+                    .collect(Collectors.toList());
         }
     }
 

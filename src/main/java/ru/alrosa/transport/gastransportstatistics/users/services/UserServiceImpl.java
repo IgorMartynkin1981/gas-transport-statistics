@@ -12,6 +12,7 @@ import ru.alrosa.transport.gastransportstatistics.users.model.User;
 import ru.alrosa.transport.gastransportstatistics.users.repositories.UserRepository;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -30,7 +31,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll()
                 .stream()
                 .map(UserMapper::toInfoUserDto)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
