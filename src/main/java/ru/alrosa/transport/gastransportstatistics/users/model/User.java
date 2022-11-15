@@ -22,7 +22,12 @@ public class User {
     private String email;
     @Column(name = "login")
     private String login;
+    @OneToOne
     @JoinColumn(name = "subdivision_id")
-    private Long subdivisionId;
+    private Subdivision subdivision;
+    @Column(name = "user_password")
+    private String userPassword;
+    @Column(name = "api_token")
+    private String apiToken;
 }
 

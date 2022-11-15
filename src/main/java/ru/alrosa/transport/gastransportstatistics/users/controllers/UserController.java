@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.alrosa.transport.gastransportstatistics.exception.Create;
+import ru.alrosa.transport.gastransportstatistics.users.dto.InfoUserDto;
 import ru.alrosa.transport.gastransportstatistics.users.dto.UserDto;
 import ru.alrosa.transport.gastransportstatistics.users.services.UserService;
 
@@ -22,22 +23,22 @@ public class UserController {
     }
 
     @GetMapping
-    public Collection<UserDto> findAllUsers() {
+    public Collection<InfoUserDto> findAllUsers() {
         return service.getAllUsers();
     }
 
     @GetMapping("/{id}")
-    public UserDto getUserById(@PathVariable Long id) {
+    public InfoUserDto getUserById(@PathVariable Long id) {
         return service.getUserById(id);
     }
 
     @PatchMapping("/{id}")
-    public UserDto updateUser(@PathVariable Long id, @RequestBody UserDto user) {
-        return service.updateUser(id, user);
+    public InfoUserDto updateUser(@Validated({Create.class}) @RequestBody UserDto user) {
+        return service.updateUser(user);
     }
 
     @PostMapping
-    public UserDto createUser(@Validated({Create.class}) @RequestBody UserDto user) {
+    public InfoUserDto createUser(@Validated({Create.class}) @RequestBody UserDto user) {
         return service.createUser(user);
     }
 

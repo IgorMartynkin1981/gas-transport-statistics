@@ -1,6 +1,8 @@
 package ru.alrosa.transport.gastransportstatistics.subdivisions.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.alrosa.transport.gastransportstatistics.exception.Create;
@@ -19,14 +21,14 @@ public class SubdivisionController {
         this.subdivisionService = subdivisionService;
     }
 
+    @GetMapping()
+    public Collection<SubdivisionDto> getSubdivisionDto() {
+        return subdivisionService.getAllSubdivisionDto();
+    }
+
     @GetMapping("/{id}")
     public SubdivisionDto getSubdivisionDtoById(@PathVariable Long id) {
         return subdivisionService.getSubdivisionDtoById(id);
-    }
-
-    @GetMapping()
-    public Collection<SubdivisionDto> getSubdivisionDtoById() {
-        return subdivisionService.getAllSubdivisionDto();
     }
 
     @PostMapping
@@ -40,8 +42,9 @@ public class SubdivisionController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUserById(@PathVariable Long id) {
+    public ResponseEntity<String> deleteUserById(@PathVariable Long id) {
         subdivisionService.deleteSubdivisionDtoById(id);
+        return new ResponseEntity<>(String.format("Subdivision with ID: %s was deleted!", id), HttpStatus.OK);
     }
 
 }

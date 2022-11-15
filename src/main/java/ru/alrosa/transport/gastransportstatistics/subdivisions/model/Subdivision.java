@@ -11,7 +11,7 @@ import javax.persistence.*;
 @ToString
 @EqualsAndHashCode(of = "id")
 @Entity
-@Table(name = "subdivision")
+@Table(name = "subdivisions")
 public class Subdivision {
     @Id
     @Column(name = "subdivision_id", nullable = false)
