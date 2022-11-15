@@ -11,7 +11,7 @@ import java.util.Collection;
 
 @Component
 public interface PlanRepository extends JpaRepository<Plan, Long> {
-    
+
     @Modifying
     @Query("SELECT b FROM Plan AS b " +
             "WHERE b.periodStart >= ?1 AND b.periodEnd <= ?2")
