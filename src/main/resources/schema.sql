@@ -27,10 +27,10 @@ CREATE TABLE IF NOT EXISTS weekly_report
     creation_time   TIMESTAMP                                  NOT NULL,
     period_start    TIMESTAMP                                  NOT NULL,
     period_end      TIMESTAMP                                  NOT NULL,
-    gas_consumption INTEGER                                    NOT NULL,
-    gas_distance    INTEGER                                    NOT NULL,
-    dt_consumption  INTEGER                                    NOT NULL,
-    dt_distance     INTEGER                                    NOT NULL
+    consumption_gas INTEGER                                    NOT NULL,
+    distance_gas    INTEGER                                    NOT NULL,
+    consumption_dt  INTEGER                                    NOT NULL,
+    distance_dt     INTEGER                                    NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS plan_gas_consumption

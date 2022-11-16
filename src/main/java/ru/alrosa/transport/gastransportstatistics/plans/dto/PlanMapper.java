@@ -1,6 +1,7 @@
 package ru.alrosa.transport.gastransportstatistics.plans.dto;
 
 import ru.alrosa.transport.gastransportstatistics.plans.model.Plan;
+import ru.alrosa.transport.gastransportstatistics.subdivisions.model.Subdivision;
 import ru.alrosa.transport.gastransportstatistics.users.model.User;
 
 import java.time.LocalDate;
@@ -23,13 +24,13 @@ public class PlanMapper {
         return infoPlanDto;
     }
 
-    public static Plan toPlan(PlanDto planDto, User user) {
+    public static Plan toPlan(PlanDto planDto, User user, Subdivision subdivision) {
         Plan plan = new Plan();
         if (planDto.getId() != null) {
             plan.setId(planDto.getId());
         }
         plan.setUser(user);
-        plan.setSubdivision(user.getSubdivision());
+        plan.setSubdivision(subdivision);
         if (planDto.getCreationTime() != null) {
             plan.setCreationTime(planDto.getCreationTime());
         } else {

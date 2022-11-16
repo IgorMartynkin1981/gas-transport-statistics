@@ -22,6 +22,7 @@ public class UserController {
         this.service = service;
     }
 
+
     @GetMapping
     public Collection<InfoUserDto> findAllUsers() {
         return service.getAllUsers();
@@ -33,7 +34,8 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public InfoUserDto updateUser(@Validated({Create.class}) @RequestBody UserDto user) {
+    public InfoUserDto updateUser(@RequestBody UserDto user) {
+        System.out.println(user.toString());
         return service.updateUser(user);
     }
 

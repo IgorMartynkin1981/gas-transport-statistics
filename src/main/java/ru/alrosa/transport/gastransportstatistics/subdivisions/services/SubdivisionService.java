@@ -6,13 +6,13 @@ import java.util.Collection;
 
 public interface SubdivisionService {
 
-    Collection<SubdivisionDto> getAllSubdivisionDto();
+    Collection<SubdivisionDto> getAllSubdivision();
 
-    SubdivisionDto getSubdivisionDtoById(Long subdivisionDtoId);
+    SubdivisionDto getSubdivisionById(Long subdivisionDtoId);
 
-    SubdivisionDto updateSubdivisionDto(SubdivisionDto subdivisionDto);
+    SubdivisionDto updateSubdivision(SubdivisionDto subdivisionDto);
 
-    SubdivisionDto createSubdivisionDto(SubdivisionDto subdivisionDto);
+    SubdivisionDto createSubdivision(SubdivisionDto subdivisionDto);
 
-    void deleteSubdivisionDtoById(Long subdivisionDtoId);
+    void deleteSubdivisionById(Long subdivisionDtoId);
 }

@@ -38,17 +38,16 @@ public class PlanController {
 
     @PostMapping
     public InfoPlanDto createPlan(@RequestBody PlanDto planDto) {
-        System.out.println(planDto.getUserId());
         return planService.createPlanDto(planDto);
     }
 
     @PatchMapping("/{id}")
-    public InfoPlanDto updateUser(@RequestBody PlanDto planDto) {
+    public InfoPlanDto updatePlan(@RequestBody PlanDto planDto) {
         return planService.updatePlanDto(planDto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUserById(@PathVariable Long id) {
+    public ResponseEntity<String> deletePlanById(@PathVariable Long id) {
         planService.deletePlanDtoById(id);
         return new ResponseEntity<>(String.format("Plan with ID: %s was deleted!", id), HttpStatus.OK);
     }

@@ -24,18 +24,18 @@ public class SubdivisionServiceImpl implements SubdivisionService {
     }
 
     @Override
-    public Collection<SubdivisionDto> getAllSubdivisionDto() {
+    public Collection<SubdivisionDto> getAllSubdivision() {
         return subdivisionRepository.findAll().stream().map(SubdivisionMapper::toSubdivisionDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public SubdivisionDto getSubdivisionDtoById(@Valid Long subdivisionDtoId) {
+    public SubdivisionDto getSubdivisionById(@Valid Long subdivisionDtoId) {
         return SubdivisionMapper.toSubdivisionDto(verifySubdivisionInRepository(subdivisionDtoId));
     }
 
     @Override
-    public SubdivisionDto createSubdivisionDto(@Valid SubdivisionDto subdivisionDto) {
+    public SubdivisionDto createSubdivision(@Valid SubdivisionDto subdivisionDto) {
         return SubdivisionMapper.toSubdivisionDto(
                 subdivisionRepository.save(
                         SubdivisionMapper.toSubdivision(subdivisionDto)
@@ -44,7 +44,7 @@ public class SubdivisionServiceImpl implements SubdivisionService {
     }
 
     @Override
-    public SubdivisionDto updateSubdivisionDto(SubdivisionDto subdivisionDto) {
+    public SubdivisionDto updateSubdivision(SubdivisionDto subdivisionDto) {
         {
             verifySubdivisionInRepository(subdivisionDto.getId());
         }
@@ -56,7 +56,7 @@ public class SubdivisionServiceImpl implements SubdivisionService {
     }
 
     @Override
-    public void deleteSubdivisionDtoById(Long subdivisionDtoId) {
+    public void deleteSubdivisionById(Long subdivisionDtoId) {
         {
             verifySubdivisionInRepository(subdivisionDtoId);
         }

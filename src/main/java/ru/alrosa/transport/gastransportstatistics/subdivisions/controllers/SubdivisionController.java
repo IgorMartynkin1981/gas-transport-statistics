@@ -23,27 +23,27 @@ public class SubdivisionController {
 
     @GetMapping()
     public Collection<SubdivisionDto> getSubdivisionDto() {
-        return subdivisionService.getAllSubdivisionDto();
+        return subdivisionService.getAllSubdivision();
     }
 
     @GetMapping("/{id}")
     public SubdivisionDto getSubdivisionDtoById(@PathVariable Long id) {
-        return subdivisionService.getSubdivisionDtoById(id);
+        return subdivisionService.getSubdivisionById(id);
     }
 
     @PostMapping
     public SubdivisionDto createSubdivisionDto(@Validated({Create.class}) @RequestBody SubdivisionDto subdivisionDto) {
-        return subdivisionService.createSubdivisionDto(subdivisionDto);
+        return subdivisionService.createSubdivision(subdivisionDto);
     }
 
     @PatchMapping("/{id}")
     public SubdivisionDto updateUser(@RequestBody SubdivisionDto subdivisionDto) {
-        return subdivisionService.updateSubdivisionDto(subdivisionDto);
+        return subdivisionService.updateSubdivision(subdivisionDto);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUserById(@PathVariable Long id) {
-        subdivisionService.deleteSubdivisionDtoById(id);
+        subdivisionService.deleteSubdivisionById(id);
         return new ResponseEntity<>(String.format("Subdivision with ID: %s was deleted!", id), HttpStatus.OK);
     }
 

@@ -42,8 +42,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public InfoUserDto createUser(UserDto userDto) {
         if (userDto.getSubdivisionId() != null) {
-            return UserMapper.toInfoUserDto(userRepository.save(
-                            UserMapper.toUser(userDto, getSubdivision(userDto.getSubdivisionId()))));
+            Subdivision subdivision = subdivisionRepository
+                    .findById(userDto.getSubdivisionId())
+                    .orElseThrow(() -> new DataNotFound(
+                            String.format("User with id %d was not found in the database", userDto.getSubdivisionId())
+                    ));
+            return UserMapper.toInfoUserDto(userRepository.save(UserMapper.toUser(userDto, subdivision)));
         } else {
             return UserMapper.toInfoUserDto(userRepository.save(UserMapper.toUser(userDto)));
         }
