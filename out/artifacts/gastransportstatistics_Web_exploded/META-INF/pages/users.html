@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-icon.png">
+    <link rel="icon" type="image/png" href="/img/favicon.png">
+    <title>
+        План и факт использования транспорта
+    </title>
+
+    <link href="/css/black-dashboard/black-dashboard.min.css?v=1.1.1" rel="stylesheet" />
+    <link href="/css/black-dashboard/nucleo-icons.css" rel="stylesheet">
+    <script src="/js/utils/md5.min.js"></script>
+</head>
+
+<body class="sidebar-mini white-content">
+	<div class="wrapper">
+
+        <div class="main-panel" data="green">
+
+			<div class="content">
+				<div class="col-md-8 ml-auto mr-auto">
+				<h2 class="text-center">Пользователи</h2>
+				</div>
+				<div class="row mt-5">
+					<div class="col-md-12">
+						<div class="card">
+							<div class="card-body" data-element="userList">
+							</div>
+						</div>						
+					</div>				
+				</div>            
+			</div>
+			
+			<footer class="footer">        
+			</footer>
+        </div>
+    </div>
+
+    <!--   Core JS Files   -->
+    <script src="/js/black-dashboard/core/jquery.min.js"></script>
+    <script src="/js/black-dashboard/core/popper.min.js"></script>
+    <script src="/js/black-dashboard/core/bootstrap.min.js"></script>
+    <script src="/js/black-dashboard/plugins/perfect-scrollbar.jquery.min.js"></script>
+    <script src="/js/black-dashboard/plugins/moment.min.js"></script>
+    <!--  Plugin for Switches, full documentation here: http://www.jque.re/plugins/version3/bootstrap.switch/ -->
+    <script src="/js/black-dashboard/plugins/bootstrap-switch.js"></script>
+    <!--  Plugin for Sweet Alert -->
+    <script src="/js/black-dashboard/plugins/sweetalert2.min.js"></script>
+    <!--  Plugin for Sorting Tables -->
+    <script src="/js/black-dashboard/plugins/jquery.tablesorter.js"></script>
+    <!-- Forms Validations Plugin -->
+    <script src="/js/black-dashboard/plugins/jquery.validate.min.js"></script>
+    <!--  Plugin for the Wizard, full documentation here: https://github.com/VinceG/twitter-bootstrap-wizard -->
+    <script src="/js/black-dashboard/plugins/jquery.bootstrap-wizard.js"></script>
+    <!--	Plugin for Select, full documentation here: http://silviomoreto.github.io/bootstrap-select -->
+    <script src="/js/black-dashboard/plugins/bootstrap-selectpicker.js"></script>
+    <!--  Plugin for the DateTimePicker, full documentation here: https://eonasdan.github.io/bootstrap-datetimepicker/ -->
+    <script src="/js/black-dashboard/plugins/bootstrap-datetimepicker.js"></script>
+    <!--  DataTables.net Plugin, full documentation here: https://datatables.net/    -->
+    <script src="/js/black-dashboard/plugins/jquery.dataTables.min.js"></script>
+    <!--	Plugin for Tags, full documentation here: https://github.com/bootstrap-tagsinput/bootstrap-tagsinputs  -->
+    <script src="/js/black-dashboard/plugins/bootstrap-tagsinput.js"></script>
+    <!-- Plugin for Fileupload, full documentation here: http://www.jasny.net/bootstrap/javascript/#fileinput -->
+    <script src="/js/black-dashboard/plugins/jasny-bootstrap.min.js"></script>
+    <!--  Full Calendar Plugin, full documentation here: https://github.com/fullcalendar/fullcalendar    -->
+    <script src="/js/black-dashboard/plugins/fullcalendar/fullcalendar.min.js"></script>
+    <script src="/js/black-dashboard/plugins/fullcalendar/daygrid.min.js"></script>
+    <script src="/js/black-dashboard/plugins/fullcalendar/timegrid.min.js"></script>
+    <script src="/js/black-dashboard/plugins/fullcalendar/interaction.min.js"></script>
+    <!-- Vector Map plugin, full documentation here: http://jvectormap.com/documentation/ -->
+    <script src="/js/black-dashboard/plugins/jquery-jvectormap.js"></script>
+    <!--  Plugin for the Sliders, full documentation here: http://refreshless.com/nouislider/ -->
+    <script src="/js/black-dashboard/plugins/nouislider.min.js"></script>
+    <!-- Chart JS -->
+    <script src="/js/black-dashboard/plugins/chartjs.min.js"></script>
+    <!--  Notifications Plugin    -->
+    <script src="/js/black-dashboard/plugins/bootstrap-notify.js"></script>
+    <!-- Control Center for Black Dashboard: parallax effects, scripts for the example pages etc -->
+    <script src="/js/black-dashboard/black-dashboard.min.js?v=1.1.1"></script>
+
+    <script type="module" src="/js/init.js"></script>  
+
+	<script type="module">
+		import PageUsers from "/js/pages/PageUsers.js";
+
+		const appendInto = document.querySelector('[data-element="userList"]');
+		const page = new PageUsers();
+		page.render()
+			.then ( resolve => {
+				appendInto.append(page.toolbar.element); 
+				appendInto.append(page.userTable.element);
+				document.body.append(page.modalWindow.element);
+			}
+		);
+
+	</script>	
+
+</body>
+
+</html>

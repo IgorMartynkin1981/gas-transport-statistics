@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Created-By: IntelliJ IDEA
+Built-By: Legen
+Build-Jdk: Amazon Corretto version 17.0.5
+Implementation-Title: gas-transport-statistics
+Implementation-Version: 0.0.1-SNAPSHOT
+Implementation-Vendor-Id: ru.alrosa.transport
+Main-Class: ${start-class}
+
