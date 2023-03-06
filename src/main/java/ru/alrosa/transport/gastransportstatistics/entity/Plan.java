@@ -1,10 +1,16 @@
 package ru.alrosa.transport.gastransportstatistics.entity;
 
-import jakarta.persistence.*;
 import lombok.Data;
 
-
+import javax.persistence.*;
 import java.time.LocalDate;
+
+/**
+ * Simple domain object that represents application plan.
+ *
+ * @author Igor Martynkin
+ * @version 1.0
+ */
 
 @Data
 @Entity

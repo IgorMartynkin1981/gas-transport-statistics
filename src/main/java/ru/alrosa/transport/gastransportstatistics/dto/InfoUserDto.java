@@ -1,9 +1,11 @@
 package ru.alrosa.transport.gastransportstatistics.dto;
 
-import jakarta.validation.constraints.*;
+
 import lombok.Data;
 import ru.alrosa.transport.gastransportstatistics.exception.Create;
 import ru.alrosa.transport.gastransportstatistics.entity.Subdivision;
+
+import javax.validation.constraints.*;
 
 @Data
 public class InfoUserDto {

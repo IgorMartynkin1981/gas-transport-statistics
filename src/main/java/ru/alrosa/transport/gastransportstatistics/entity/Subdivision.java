@@ -1,7 +1,15 @@
 package ru.alrosa.transport.gastransportstatistics.entity;
 
-import jakarta.persistence.*;
 import lombok.*;
+
+import javax.persistence.*;
+
+/**
+ * Simple domain object that represents application subdivisions.
+ *
+ * @author Igor Martynkin
+ * @version 1.0
+ */
 
 @Getter
 @Setter

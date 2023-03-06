@@ -11,7 +11,7 @@ public class UserMapper {
         infoUserDto.setFirstName(user.getFirstName());
         infoUserDto.setLastName(user.getLastName());
         infoUserDto.setEmail(user.getEmail());
-        infoUserDto.setLogin(user.getLogin());
+        //infoUserDto.setLogin(user.getLogin());
         infoUserDto.setSubdivision(user.getSubdivision());
 
         return infoUserDto;
@@ -25,7 +25,7 @@ public class UserMapper {
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
         user.setEmail(userDto.getEmail());
-        user.setLogin(userDto.getLogin());
+        //user.setLogin(userDto.getLogin());
         user.setSubdivision(subdivision);
 
         return user;
@@ -39,7 +39,7 @@ public class UserMapper {
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
         user.setEmail(userDto.getEmail());
-        user.setLogin(userDto.getLogin());
+        //user.setLogin(userDto.getLogin());
 
         return user;
     }

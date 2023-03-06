@@ -85,9 +85,11 @@ public class UserServiceImpl implements UserService {
         if (user.getEmail() != null) {
             userFromData.setEmail(user.getEmail());
         }
-        if (user.getLogin() != null) {
-            userFromData.setLogin(user.getLogin());
-        }
+
+//        if (user.getLogin() != null) {
+//            userFromData.setLogin(user.getLogin());
+//        }
+
         if (user.getSubdivision() != null) {
             userFromData.setSubdivision(user.getSubdivision());
         }

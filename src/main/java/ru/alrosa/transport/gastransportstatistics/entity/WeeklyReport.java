@@ -1,11 +1,16 @@
 package ru.alrosa.transport.gastransportstatistics.entity;
 
-import jakarta.persistence.*;
 import lombok.Data;
-import ru.alrosa.transport.gastransportstatistics.entity.Subdivision;
-import ru.alrosa.transport.gastransportstatistics.entity.User;
 
+import javax.persistence.*;
 import java.time.LocalDate;
+
+/**
+ * Simple domain object that represents application weekly_report.
+ *
+ * @author Igor Martynkin
+ * @version 1.0
+ */
 
 @Data
 @Entity

@@ -1,6 +1,7 @@
 package ru.alrosa.transport.gastransportstatistics.services;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.alrosa.transport.gastransportstatistics.exception.DataNotFound;

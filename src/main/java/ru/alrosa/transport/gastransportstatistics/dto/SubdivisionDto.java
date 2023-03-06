@@ -1,8 +1,9 @@
 package ru.alrosa.transport.gastransportstatistics.dto;
 
-import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.*;
 
 @Data
 @NoArgsConstructor
