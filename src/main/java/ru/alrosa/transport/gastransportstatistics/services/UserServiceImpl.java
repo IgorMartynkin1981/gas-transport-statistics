@@ -1,9 +1,11 @@
 package ru.alrosa.transport.gastransportstatistics.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.alrosa.transport.gastransportstatistics.exception.DataNotFound;
 import ru.alrosa.transport.gastransportstatistics.entity.Subdivision;
+import ru.alrosa.transport.gastransportstatistics.repositories.RoleRepository;
 import ru.alrosa.transport.gastransportstatistics.repositories.SubdivisionRepository;
 import ru.alrosa.transport.gastransportstatistics.dto.InfoUserDto;
 import ru.alrosa.transport.gastransportstatistics.dto.UserDto;
@@ -12,17 +14,32 @@ import ru.alrosa.transport.gastransportstatistics.entity.User;
 import ru.alrosa.transport.gastransportstatistics.repositories.UserRepository;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+/**
+ * Implementation of {@link UserService} interface.
+ * Wrapper for {@link UserRepository} + business logic.
+ *
+ * @author Igor Martynkin
+ * @version 1.0
+ */
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    //private final BCryptPasswordEncoder passwordEncoder;
     private final SubdivisionRepository subdivisionRepository;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, SubdivisionRepository subdivisionRepository) {
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository,
+//                           BCryptPasswordEncoder passwordEncoder,
+                           SubdivisionRepository subdivisionRepository) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        //this.passwordEncoder = passwordEncoder;
         this.subdivisionRepository = subdivisionRepository;
     }
 
@@ -37,6 +54,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public InfoUserDto getUserById(Long userId) {
         return UserMapper.toInfoUserDto(findAndVerifyUserInRepository(userId));
+    }
+
+    @Override
+    public User findByUsername(String username) {
+        User result = userRepository.findByUsername(username);
+        return result;
     }
 
     @Override

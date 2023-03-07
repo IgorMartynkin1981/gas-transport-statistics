@@ -8,7 +8,7 @@ package ru.alrosa.transport.gastransportstatistics.entity;
  */
 
 public enum ERole {
-    USER,
-    MODERATOR,
-    ADMIN
+    ROLE_USER,
+    ROLE_MODERATOR,
+    ROLE_ADMIN
 }

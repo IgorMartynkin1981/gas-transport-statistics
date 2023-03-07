@@ -2,9 +2,12 @@ package ru.alrosa.transport.gastransportstatistics.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Date;
+import java.util.Set;
 
 /**
  * Simple domain object that represents application user.
@@ -45,6 +48,18 @@ public class User {
     @JoinTable(name = "user_roles",
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id")})
-    private List<Role> roles;
+    private Set<Role> roles;
+
+    @CreatedDate
+    @Column(name = "created")
+    private Date created;
+
+    @LastModifiedDate
+    @Column(name = "updated")
+    private Date updated;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private Status status;
 }
 
