@@ -1,14 +1,12 @@
 package ru.alrosa.transport.gastransportstatistics.entity;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.Collection;
 
 /**
  * Simple domain object that represents application user.
@@ -18,7 +16,6 @@ import java.util.Set;
  */
 
 @Data
-@NoArgsConstructor
 @Entity
 @Table(name = "users")
 public class User {
@@ -26,7 +23,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "username")
+    @Column(unique = true)
     private String username;
 
     @Column(name = "first_name")
@@ -46,18 +43,18 @@ public class User {
     private Subdivision subdivision;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_roles",
+    @JoinTable(name = "users_roles",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
-    private List<Role> roles;
+    private Collection<Role> roles;
 
     @CreatedDate
     @Column(name = "created")
-    private Date created;
+    private LocalDateTime created;
 
     @LastModifiedDate
     @Column(name = "updated")
-    private Date updated;
+    private LocalDateTime updated;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")

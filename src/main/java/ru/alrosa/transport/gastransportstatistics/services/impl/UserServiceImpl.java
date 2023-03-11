@@ -1,9 +1,10 @@
 package ru.alrosa.transport.gastransportstatistics.services.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.alrosa.transport.gastransportstatistics.dto.InfoUserDto;
+import ru.alrosa.transport.gastransportstatistics.dto.UserAuthentication;
 import ru.alrosa.transport.gastransportstatistics.dto.UserDto;
 import ru.alrosa.transport.gastransportstatistics.dto.UserMapper;
 import ru.alrosa.transport.gastransportstatistics.entity.Role;
@@ -16,6 +17,7 @@ import ru.alrosa.transport.gastransportstatistics.repositories.SubdivisionReposi
 import ru.alrosa.transport.gastransportstatistics.repositories.UserRepository;
 import ru.alrosa.transport.gastransportstatistics.services.UserService;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -32,19 +34,20 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
-    private final SubdivisionRepository subdivisionRepository;
+    private UserRepository userRepository;
+    private RoleRepository roleRepository;
+    private SubdivisionRepository subdivisionRepository;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository,
-                           BCryptPasswordEncoder passwordEncoder,
-                           SubdivisionRepository subdivisionRepository) {
+    public UserServiceImpl(UserRepository userRepository,
+                           RoleRepository roleRepository,
+                           SubdivisionRepository subdivisionRepository,
+                           PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
         this.subdivisionRepository = subdivisionRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -67,29 +70,33 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public InfoUserDto createUser(UserDto userDto) {
+    public InfoUserDto createUser(UserAuthentication userAuthentication) {
         Role roleUser = roleRepository.findByName("ROLE_USER");
         List<Role> userRoles = new ArrayList<>();
         userRoles.add(roleUser);
 
-        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        userDto.setRoles(userRoles);
-        userDto.setStatus(Status.ACTIVE);
-        if (userDto.getSubdivisionId() != null) {
+        userAuthentication.setPassword(passwordEncoder.encode(userAuthentication.getPassword()));
+        userAuthentication.setRoles(userRoles);
+        userAuthentication.setCreated(LocalDateTime.now());
+        userAuthentication.setUpdated(LocalDateTime.now());
+        userAuthentication.setStatus(Status.ACTIVE);
+
+        if (userAuthentication.getSubdivisionId() != null) {
             Subdivision subdivision = subdivisionRepository
-                    .findById(userDto.getSubdivisionId())
+                    .findById(userAuthentication.getSubdivisionId())
                     .orElseThrow(() -> new DataNotFound(
-                            String.format("User with id %d was not found in the database", userDto.getSubdivisionId())
+                            String.format("User with id %d was not found in the database", userAuthentication.getSubdivisionId())
                     ));
-            return UserMapper.toInfoUserDto(userRepository.save(UserMapper.toUser(userDto, subdivision)));
+            return UserMapper.toInfoUserDto(userRepository.save(UserMapper.toUser(userAuthentication, subdivision)));
         } else {
-            return UserMapper.toInfoUserDto(userRepository.save(UserMapper.toUser(userDto)));
+            return UserMapper.toInfoUserDto(userRepository.save(UserMapper.toUser(userAuthentication)));
         }
     }
 
     @Override
     public InfoUserDto updateUser(UserDto userDto) {
         User user = findAndVerifyUserInRepository(userDto.getId());
+        user.setUpdated(LocalDateTime.now());
         if (userDto.getSubdivisionId() != null) {
             return UserMapper.toInfoUserDto(userRepository.save(updateUserFromData(
                     UserMapper.toUser(userDto, getSubdivision(userDto.getSubdivisionId())), user)));
@@ -109,6 +116,7 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(userId);
     }
 
+    //TODO доделать
     private User updateUserFromData(User user, User userFromData) {
         if (user.getFirstName() != null) {
             userFromData.setFirstName(user.getFirstName());

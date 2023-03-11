@@ -33,6 +33,40 @@ public class UserMapper {
         return user;
     }
 
+    //This method only created new user
+    public static User toUser(UserAuthentication userAuthentication, Subdivision subdivision) {
+        User user = new User();
+
+        user.setUsername(userAuthentication.getUsername());
+        user.setFirstName(userAuthentication.getFirstName());
+        user.setLastName(userAuthentication.getLastName());
+        user.setEmail(userAuthentication.getEmail());
+        user.setPassword(userAuthentication.getPassword());
+        user.setRoles(userAuthentication.getRoles());
+        user.setStatus(userAuthentication.getStatus());
+        user.setSubdivision(subdivision);
+        user.setCreated(userAuthentication.getCreated());
+        user.setUpdated(userAuthentication.getUpdated());
+
+        return user;
+    }
+
+    public static User toUser(UserAuthentication userAuthentication) {
+        User user = new User();
+
+        user.setUsername(userAuthentication.getUsername());
+        user.setFirstName(userAuthentication.getFirstName());
+        user.setLastName(userAuthentication.getLastName());
+        user.setEmail(userAuthentication.getEmail());
+        user.setPassword(userAuthentication.getPassword());
+        user.setRoles(userAuthentication.getRoles());
+        user.setStatus(userAuthentication.getStatus());
+        user.setCreated(userAuthentication.getCreated());
+        user.setUpdated(userAuthentication.getUpdated());
+
+        return user;
+    }
+
     public static User toUser(UserDto userDto) {
         User user = new User();
         if (userDto.getId() != null) {
