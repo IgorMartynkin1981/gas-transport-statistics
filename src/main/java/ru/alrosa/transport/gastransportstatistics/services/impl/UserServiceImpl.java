@@ -1,20 +1,24 @@
-package ru.alrosa.transport.gastransportstatistics.services;
+package ru.alrosa.transport.gastransportstatistics.services.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.alrosa.transport.gastransportstatistics.exception.DataNotFound;
-import ru.alrosa.transport.gastransportstatistics.entity.Subdivision;
-import ru.alrosa.transport.gastransportstatistics.repositories.RoleRepository;
-import ru.alrosa.transport.gastransportstatistics.repositories.SubdivisionRepository;
 import ru.alrosa.transport.gastransportstatistics.dto.InfoUserDto;
 import ru.alrosa.transport.gastransportstatistics.dto.UserDto;
 import ru.alrosa.transport.gastransportstatistics.dto.UserMapper;
+import ru.alrosa.transport.gastransportstatistics.entity.Role;
+import ru.alrosa.transport.gastransportstatistics.entity.Status;
+import ru.alrosa.transport.gastransportstatistics.entity.Subdivision;
 import ru.alrosa.transport.gastransportstatistics.entity.User;
+import ru.alrosa.transport.gastransportstatistics.exception.DataNotFound;
+import ru.alrosa.transport.gastransportstatistics.repositories.RoleRepository;
+import ru.alrosa.transport.gastransportstatistics.repositories.SubdivisionRepository;
 import ru.alrosa.transport.gastransportstatistics.repositories.UserRepository;
+import ru.alrosa.transport.gastransportstatistics.services.UserService;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Optional;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -30,16 +34,16 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    //private final BCryptPasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
     private final SubdivisionRepository subdivisionRepository;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository,
-//                           BCryptPasswordEncoder passwordEncoder,
+                           BCryptPasswordEncoder passwordEncoder,
                            SubdivisionRepository subdivisionRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
-        //this.passwordEncoder = passwordEncoder;
+        this.passwordEncoder = passwordEncoder;
         this.subdivisionRepository = subdivisionRepository;
     }
 
@@ -64,6 +68,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public InfoUserDto createUser(UserDto userDto) {
+        Role roleUser = roleRepository.findByName("ROLE_USER");
+        List<Role> userRoles = new ArrayList<>();
+        userRoles.add(roleUser);
+
+        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        userDto.setRoles(userRoles);
+        userDto.setStatus(Status.ACTIVE);
         if (userDto.getSubdivisionId() != null) {
             Subdivision subdivision = subdivisionRepository
                     .findById(userDto.getSubdivisionId())

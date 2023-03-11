@@ -17,6 +17,6 @@ public class InfoUserDto {
     private String lastName;
     @Email(groups = {Create.class})
     private String email;
-    private String login;
+    private String userName;
     private Subdivision subdivision;
 }

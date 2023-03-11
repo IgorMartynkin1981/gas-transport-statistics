@@ -1,4 +1,4 @@
-package ru.alrosa.transport.gastransportstatistics.services;
+package ru.alrosa.transport.gastransportstatistics.services.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +14,7 @@ import ru.alrosa.transport.gastransportstatistics.entity.Subdivision;
 import ru.alrosa.transport.gastransportstatistics.repositories.SubdivisionRepository;
 import ru.alrosa.transport.gastransportstatistics.entity.User;
 import ru.alrosa.transport.gastransportstatistics.repositories.UserRepository;
+import ru.alrosa.transport.gastransportstatistics.services.PlanService;
 
 import java.util.Collection;
 import java.util.stream.Collectors;

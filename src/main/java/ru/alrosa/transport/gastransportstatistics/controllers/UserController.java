@@ -43,8 +43,8 @@ public class UserController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    //public InfoUserDto createUser(@Validated({Create.class}) @RequestBody UserDto user) {
-        public InfoUserDto createUser(@RequestBody UserDto user) {
+    public InfoUserDto createUser(@Validated({Create.class}) @RequestBody UserDto user) {
+        //public InfoUserDto createUser(@RequestBody UserDto user) {
         return service.createUser(user);
     }
 

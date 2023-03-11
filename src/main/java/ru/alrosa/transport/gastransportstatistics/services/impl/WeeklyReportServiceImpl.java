@@ -1,4 +1,4 @@
-package ru.alrosa.transport.gastransportstatistics.services;
+package ru.alrosa.transport.gastransportstatistics.services.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +14,7 @@ import ru.alrosa.transport.gastransportstatistics.dto.WeeklyReportDto;
 import ru.alrosa.transport.gastransportstatistics.dto.WeeklyReportMapper;
 import ru.alrosa.transport.gastransportstatistics.entity.WeeklyReport;
 import ru.alrosa.transport.gastransportstatistics.repositories.WeeklyReportRepositories;
+import ru.alrosa.transport.gastransportstatistics.services.WeeklyReportService;
 
 import java.util.Collection;
 import java.util.stream.Collectors;

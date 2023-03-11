@@ -44,10 +44,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers(LOGIN_ENDPOINT).permitAll()
-                .antMatchers("/api/v1/admin/signup").permitAll()
-                .antMatchers(ADMIN_ENDPOINT).hasRole("ADMIN")
-                .anyRequest().authenticated()
+                .antMatchers("/pages/**").permitAll()
+                .and()
+                .authorizeRequests()
+                .antMatchers("/pages/users.html").hasRole("ADMIN")
+                //Добавить нового пользователя
+                //.antMatchers("/api/v1/auth/signup").permitAll()
+                //Войти
+                //.antMatchers("/api/v1/auth/signin").permitAll()
+                //.antMatchers(ADMIN_ENDPOINT).hasRole("ADMIN")
+                //.anyRequest().authenticated()
                 .and()
                 .apply(new JwtConfigurer(jwtTokenProvider));
     }
