@@ -1,16 +1,16 @@
 package ru.alrosa.transport.gastransportstatistics.services.impl;
 
-import javax.validation.Valid;
-
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.alrosa.transport.gastransportstatistics.exception.DataNotFound;
-import ru.alrosa.transport.gastransportstatistics.exception.ValidationDataException;
 import ru.alrosa.transport.gastransportstatistics.dto.SubdivisionDto;
 import ru.alrosa.transport.gastransportstatistics.dto.SubdivisionMapper;
 import ru.alrosa.transport.gastransportstatistics.entity.Subdivision;
+import ru.alrosa.transport.gastransportstatistics.exception.DataNotFound;
+import ru.alrosa.transport.gastransportstatistics.exception.ValidationDataException;
 import ru.alrosa.transport.gastransportstatistics.repositories.SubdivisionRepository;
 import ru.alrosa.transport.gastransportstatistics.services.SubdivisionService;
+
 
 import java.util.Collection;
 import java.util.stream.Collectors;

@@ -1,17 +1,20 @@
 package ru.alrosa.transport.gastransportstatistics.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import ru.alrosa.transport.gastransportstatistics.entity.Role;
 import ru.alrosa.transport.gastransportstatistics.entity.Status;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
 @Data
 public class UserAuthentication {
+
+    private Long id;
+
     @NotBlank
     private String username;
 

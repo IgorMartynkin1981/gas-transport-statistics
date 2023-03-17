@@ -77,14 +77,14 @@ export default class PageUsers {
             delete user.password; 
         }
 
-        if ( user.lastName && user.firstName && user.login && user.email.indexOf('@') > 0) {  
+        if ( user.userName && user.password && user.lastName && user.firstName && user.login && user.email.indexOf('@') > 0) {
             this.saveData(user)
                 .then(resolve => { console.log(resolve) });
         }
     }
 
     async saveData( usr ) {
-        const urlSaveUser = new URL (URL_USERS, "http://localhost:42727");
+        const urlSaveUser = new URL ("/signup", "http://localhost:42727/user_console");
         
         /*$.ajax({
             type: "POST",

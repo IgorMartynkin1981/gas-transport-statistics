@@ -1,5 +1,6 @@
 package ru.alrosa.transport.gastransportstatistics.services.impl;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -11,7 +12,7 @@ import ru.alrosa.transport.gastransportstatistics.entity.Role;
 import ru.alrosa.transport.gastransportstatistics.entity.User;
 import ru.alrosa.transport.gastransportstatistics.repositories.UserRepository;
 
-import javax.transaction.Transactional;
+
 import java.util.Collection;
 import java.util.stream.Collectors;
 

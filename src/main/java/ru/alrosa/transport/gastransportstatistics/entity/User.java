@@ -1,10 +1,11 @@
 package ru.alrosa.transport.gastransportstatistics.entity;
 
+
+import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Collection;
 

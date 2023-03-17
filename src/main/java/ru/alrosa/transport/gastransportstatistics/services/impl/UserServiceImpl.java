@@ -5,7 +5,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.alrosa.transport.gastransportstatistics.dto.InfoUserDto;
 import ru.alrosa.transport.gastransportstatistics.dto.UserAuthentication;
-import ru.alrosa.transport.gastransportstatistics.dto.UserDto;
 import ru.alrosa.transport.gastransportstatistics.dto.UserMapper;
 import ru.alrosa.transport.gastransportstatistics.entity.Role;
 import ru.alrosa.transport.gastransportstatistics.entity.Status;
@@ -52,7 +51,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Collection<InfoUserDto> getAllUsers() {
-        return userRepository.findAll()
+        return userRepository
+                .findAll()
                 .stream()
                 .map(UserMapper::toInfoUserDto)
                 .collect(Collectors.toList());
@@ -65,8 +65,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByUsername(String username) {
-        User result = userRepository.findByUsername(username);
-        return result;
+        return userRepository.findByUsername(username);
     }
 
     @Override
@@ -85,7 +84,8 @@ public class UserServiceImpl implements UserService {
             Subdivision subdivision = subdivisionRepository
                     .findById(userAuthentication.getSubdivisionId())
                     .orElseThrow(() -> new DataNotFound(
-                            String.format("User with id %d was not found in the database", userAuthentication.getSubdivisionId())
+                            String.format("User with id %d was not found in the database",
+                                    userAuthentication.getSubdivisionId())
                     ));
             return UserMapper.toInfoUserDto(userRepository.save(UserMapper.toUser(userAuthentication, subdivision)));
         } else {
@@ -94,16 +94,37 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public InfoUserDto updateUser(UserDto userDto) {
-        User user = findAndVerifyUserInRepository(userDto.getId());
+    public InfoUserDto updateUser(UserAuthentication userAuthentication) {
+        User user = findAndVerifyUserInRepository(userAuthentication.getId());
         user.setUpdated(LocalDateTime.now());
-        if (userDto.getSubdivisionId() != null) {
-            return UserMapper.toInfoUserDto(userRepository.save(updateUserFromData(
-                    UserMapper.toUser(userDto, getSubdivision(userDto.getSubdivisionId())), user)));
+
+        if (userAuthentication.getSubdivisionId() != null) {
+            return UserMapper.toInfoUserDto(userRepository.
+                    save(updateUserFromData(
+                            UserMapper.toUser(
+                                    userAuthentication,
+                                    getSubdivision(userAuthentication.getSubdivisionId())),
+                            user)
+                    )
+            );
         } else {
-            return UserMapper.toInfoUserDto(userRepository.save(updateUserFromData(
-                    UserMapper.toUser(userDto), user)));
+            return UserMapper.toInfoUserDto(userRepository.
+                    save(updateUserFromData(
+                            UserMapper.toUser(userAuthentication),
+                            user)
+                    )
+            );
         }
+    }
+
+    @Override
+    public void deactivationUser(Long userId) {
+        User user = findAndVerifyUserInRepository(userId);
+
+        user.setStatus(Status.DISABLE);
+        user.setUpdated(LocalDateTime.now());
+
+        userRepository.save(user);
     }
 
     private User findAndVerifyUserInRepository(Long userId) {
@@ -116,25 +137,16 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(userId);
     }
 
-    //TODO доделать
     private User updateUserFromData(User user, User userFromData) {
-        if (user.getFirstName() != null) {
-            userFromData.setFirstName(user.getFirstName());
-        }
-        if (user.getLastName() != null) {
-            userFromData.setLastName(user.getLastName());
-        }
-        if (user.getEmail() != null) {
-            userFromData.setEmail(user.getEmail());
-        }
 
-//        if (user.getLogin() != null) {
-//            userFromData.setLogin(user.getLogin());
-//        }
+        if (user.getUsername() != null) userFromData.setUsername(user.getUsername());
+        if (user.getFirstName() != null) userFromData.setFirstName(user.getFirstName());
+        if (user.getLastName() != null) userFromData.setLastName(user.getLastName());
+        if (user.getEmail() != null) userFromData.setEmail(user.getEmail());
+        if (user.getPassword() != null) userFromData.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (user.getSubdivision() != null) userFromData.setSubdivision(user.getSubdivision());
+        if (user.getStatus() != null) userFromData.setStatus(user.getStatus());
 
-        if (user.getSubdivision() != null) {
-            userFromData.setSubdivision(user.getSubdivision());
-        }
         return userFromData;
     }
 

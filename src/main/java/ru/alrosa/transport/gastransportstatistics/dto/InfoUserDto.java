@@ -1,11 +1,11 @@
 package ru.alrosa.transport.gastransportstatistics.dto;
 
-
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
-import ru.alrosa.transport.gastransportstatistics.exception.Create;
 import ru.alrosa.transport.gastransportstatistics.entity.Subdivision;
-
-import javax.validation.constraints.*;
+import ru.alrosa.transport.gastransportstatistics.exception.Create;
 
 @Data
 public class InfoUserDto {
@@ -17,6 +17,6 @@ public class InfoUserDto {
     private String lastName;
     @Email(groups = {Create.class})
     private String email;
-    private String userName;
+    private String username;
     private Subdivision subdivision;
 }

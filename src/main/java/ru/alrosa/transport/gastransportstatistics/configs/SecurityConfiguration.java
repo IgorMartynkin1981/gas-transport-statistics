@@ -2,6 +2,7 @@ package ru.alrosa.transport.gastransportstatistics.configs;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -15,6 +16,7 @@ import ru.alrosa.transport.gastransportstatistics.services.impl.UserDetailServic
  * DTO DAO Authentication
  */
 
+@Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
 
@@ -29,19 +31,35 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .httpBasic().disable()
-                .authorizeRequests()
-                .antMatchers("/**").permitAll()
-                .antMatchers("/adminka/**").permitAll()
-//                .antMatchers("/adminka/signup").permitAll()
-                .antMatchers("/admin/**").authenticated()
-//                .antMatchers("/pageAdminRole/**").hasRole("ADMIN")
-//                //.anyRequest().authenticated()
-                .and()
+//                .httpBasic().disable()
+                .authorizeHttpRequests((a) -> a
+                                .requestMatchers(
+//                                "/**",
+//                                "/admin",
+                                        "/users/**",
+                                        "/plans/**",
+                                        "/subdivisions/**",
+                                        "/weeklyreport/**",
+                                        "/user_console",
+                                        "/user_console/**",
+                                        "/user_console/signup",
+                                        "/resources/**",
+                                        "/webapp/**",
+                                        "/.vscode/**",
+                                        "/css/**",
+                                        "/fonts/**",
+                                        "/img/**",
+                                        "/js/**",
+                                        "/pages/**"
+                                ).permitAll()
+                                .requestMatchers("/admin_console/**", "/admin").authenticated()
+                )
                 .formLogin()
                 .and()
-                .logout().logoutSuccessUrl("/");
-
+                .logout();
+        //.requestMatchers("/admin_console/**").authenticated()
+        //.requestMatchers("/admin_console/delete/**").authenticated())
+        //.anyRequest().authenticated()
         return http.build();
     }
 
