@@ -1,17 +1,14 @@
 package ru.alrosa.transport.gastransportstatistics.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.alrosa.transport.gastransportstatistics.dto.InfoWeeklyReportDto;
-import ru.alrosa.transport.gastransportstatistics.dto.WeeklyReportDto;
 import ru.alrosa.transport.gastransportstatistics.services.WeeklyReportService;
 
 import java.util.Collection;
 
 @RestController
-@RequestMapping(path = "/weeklyreport")
+@RequestMapping(path = "/weekly_report")
 public class WeeklyReportController {
 
     private final WeeklyReportService weeklyReportService;
@@ -34,21 +31,5 @@ public class WeeklyReportController {
     @GetMapping("/{id}")
     public InfoWeeklyReportDto getWeeklyReportById(@PathVariable Long id) {
         return weeklyReportService.getWeeklyReportById(id);
-    }
-
-    @PostMapping
-    public InfoWeeklyReportDto createWeeklyReport(@RequestBody WeeklyReportDto weeklyReportDto) {
-        return weeklyReportService.createWeeklyReport(weeklyReportDto);
-    }
-
-    @PatchMapping("/{id}")
-    public InfoWeeklyReportDto updateWeeklyReport(@RequestBody WeeklyReportDto weeklyReportDto) {
-        return weeklyReportService.updateWeeklyReport(weeklyReportDto);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteWeeklyReportById(@PathVariable Long id) {
-        weeklyReportService.deleteWeeklyReportById(id);
-        return new ResponseEntity<>(String.format("Plan with ID: %s was deleted!", id), HttpStatus.OK);
     }
 }

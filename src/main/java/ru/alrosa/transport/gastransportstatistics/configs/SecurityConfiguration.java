@@ -20,7 +20,7 @@ import ru.alrosa.transport.gastransportstatistics.services.impl.UserDetailServic
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-    private UserDetailServiceImpl userService;
+    private final UserDetailServiceImpl userService;
 
     @Autowired
     public SecurityConfiguration(UserDetailServiceImpl userService) {
@@ -31,18 +31,14 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-//                .httpBasic().disable()
                 .authorizeHttpRequests((a) -> a
                                 .requestMatchers(
-//                                "/**",
-//                                "/admin",
+                                        "/moderator_console/**",
                                         "/users/**",
                                         "/plans/**",
                                         "/subdivisions/**",
-                                        "/weeklyreport/**",
-                                        "/user_console",
+                                        "/weekly_report/**",
                                         "/user_console/**",
-                                        "/user_console/signup",
                                         "/resources/**",
                                         "/webapp/**",
                                         "/.vscode/**",
@@ -52,14 +48,12 @@ public class SecurityConfiguration {
                                         "/js/**",
                                         "/pages/**"
                                 ).permitAll()
-                                .requestMatchers("/admin_console/**", "/admin").authenticated()
+                                .requestMatchers("/moderator_console/**").hasRole("MODERATOR")
+                                .requestMatchers("/admin_console/**", "/admin").hasRole("ADMIN")
                 )
                 .formLogin()
                 .and()
                 .logout();
-        //.requestMatchers("/admin_console/**").authenticated()
-        //.requestMatchers("/admin_console/delete/**").authenticated())
-        //.anyRequest().authenticated()
         return http.build();
     }
 

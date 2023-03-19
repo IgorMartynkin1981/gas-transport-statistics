@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import ru.alrosa.transport.gastransportstatistics.entity.Role;
-import ru.alrosa.transport.gastransportstatistics.entity.Status;
+import ru.alrosa.transport.gastransportstatistics.entity.enums.Status;
 
 import java.time.LocalDateTime;
 import java.util.Collection;

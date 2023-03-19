@@ -7,7 +7,7 @@ import ru.alrosa.transport.gastransportstatistics.dto.InfoUserDto;
 import ru.alrosa.transport.gastransportstatistics.dto.UserAuthentication;
 import ru.alrosa.transport.gastransportstatistics.dto.UserMapper;
 import ru.alrosa.transport.gastransportstatistics.entity.Role;
-import ru.alrosa.transport.gastransportstatistics.entity.Status;
+import ru.alrosa.transport.gastransportstatistics.entity.enums.Status;
 import ru.alrosa.transport.gastransportstatistics.entity.Subdivision;
 import ru.alrosa.transport.gastransportstatistics.entity.User;
 import ru.alrosa.transport.gastransportstatistics.exception.DataNotFound;
@@ -33,10 +33,10 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepository;
-    private RoleRepository roleRepository;
-    private SubdivisionRepository subdivisionRepository;
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final SubdivisionRepository subdivisionRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,

@@ -2,7 +2,7 @@ package ru.alrosa.transport.gastransportstatistics.dto;
 
 import lombok.Data;
 import ru.alrosa.transport.gastransportstatistics.entity.Role;
-import ru.alrosa.transport.gastransportstatistics.entity.Status;
+import ru.alrosa.transport.gastransportstatistics.entity.enums.Status;
 
 import java.util.Collection;
 
