@@ -2,8 +2,9 @@ package ru.alrosa.transport.gastransportstatistics.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.alrosa.transport.gastransportstatistics.entity.Subdivision;
+import ru.alrosa.transport.gastransportstatistics.entity.Role;
 
 @Repository
-public interface SubdivisionRepository extends JpaRepository<Subdivision, Long> {
+public interface RoleRepository extends JpaRepository<Role, Long> {
+    Role findByName(String name);
 }

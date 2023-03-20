@@ -1,6 +1,8 @@
 package ru.alrosa.transport.gastransportstatistics.dto;
 
-import jakarta.validation.constraints.*;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,8 +12,6 @@ public class SubdivisionDto {
     @Positive
     private Long id;
     @NotBlank
-    @NotEmpty
-    @NotNull
     private String subdivisionName;
     private String subdivisionFullName;
 }

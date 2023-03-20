@@ -1,10 +1,11 @@
 package ru.alrosa.transport.gastransportstatistics.dto;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
-import ru.alrosa.transport.gastransportstatistics.exception.Create;
 import ru.alrosa.transport.gastransportstatistics.entity.Subdivision;
 import ru.alrosa.transport.gastransportstatistics.entity.User;
+import ru.alrosa.transport.gastransportstatistics.exception.Create;
 
 import java.time.LocalDate;
 

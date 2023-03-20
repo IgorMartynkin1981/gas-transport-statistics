@@ -1,6 +1,10 @@
 package ru.alrosa.transport.gastransportstatistics.dto;
 
 import lombok.Data;
+import ru.alrosa.transport.gastransportstatistics.entity.Role;
+import ru.alrosa.transport.gastransportstatistics.entity.enums.Status;
+
+import java.util.Collection;
 
 @Data
 public class UserDto {
@@ -8,6 +12,9 @@ public class UserDto {
     private String firstName;
     private String lastName;
     private String email;
-    private String login;
+    private String userName;
+    private String password;
+    private Collection<Role> roles;
+    private Status status;
     private Long subdivisionId;
 }
