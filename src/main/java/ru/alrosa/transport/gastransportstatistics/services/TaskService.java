@@ -2,8 +2,10 @@ package ru.alrosa.transport.gastransportstatistics.services;
 
 import ru.alrosa.transport.gastransportstatistics.entity.Task;
 
+import java.util.Collection;
+
 public interface TaskService {
-    Task getAllTasks();
+    Collection<Task> getAllTasks(String periodStart, String periodEnd);
 
     Task getTaskById(Long id);
 

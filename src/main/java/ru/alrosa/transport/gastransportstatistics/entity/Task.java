@@ -5,7 +5,6 @@ import lombok.Data;
 import ru.alrosa.transport.gastransportstatistics.entity.enums.TaskStatus;
 
 import java.time.LocalDate;
-import java.util.Objects;
 
 /**
  * Simple domain object that represents application tasks from protocol.
@@ -43,33 +42,4 @@ public class Task {
 
     @Column(nullable = false)
     private String task;
-
-    @Override
-    public String toString() {
-        return "Task{" +
-                "id=" + id +
-                ", owner=" + owner +
-                ", responsibleExecutor=" + responsibleExecutor +
-                ", creationTime=" + creationTime +
-                ", periodOfExecution=" + periodOfExecution +
-                ", status=" + status +
-                ", task='" + task + '\'' +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Task task1 = (Task) o;
-        return id.equals(task1.id) && owner.equals(task1.owner)
-                && responsibleExecutor.equals(task1.responsibleExecutor)
-                && creationTime.equals(task1.creationTime) && periodOfExecution.equals(task1.periodOfExecution)
-                && status == task1.status && task.equals(task1.task);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, owner, responsibleExecutor, creationTime, periodOfExecution, status, task);
-    }
 }

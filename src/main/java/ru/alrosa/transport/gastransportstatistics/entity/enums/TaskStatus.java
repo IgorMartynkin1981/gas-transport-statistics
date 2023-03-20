@@ -19,7 +19,6 @@ public enum TaskStatus {
     ON_HOLD("Когда не возможно перевести задачу на следующую стадию", "Если по задаче возникли вопросы, тормозящие выполнение задачи, задача переводится в статус 'On Hold'. В задаче оставляется обязательный комментарий в чем именно проблема с выполнением и она переводится на того человека/отдел, который может предоставить недостающую информацию или оказать другую помощь в решении. Когда человек ответил на вопрос - статус не меняется, но задача переводится на человека, который задавал вопрос."),
     REJECTED("Отклонена", "Когда задачу более не нужно выполнять (используется вместо удаления задачи).");
 
-
     private final String translateForRus;
     private final String explanation;
 
@@ -28,5 +27,11 @@ public enum TaskStatus {
         this.explanation = explanation;
     }
 
+    public String getTranslateForRus() {
+        return translateForRus;
+    }
 
+    public String getExplanation() {
+        return explanation;
+    }
 }
