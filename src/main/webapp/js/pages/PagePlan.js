@@ -18,7 +18,7 @@ export default class PagePlan {
         if (this.formButtons) {
             button = this.formButtons.find( item => { return item.nameId === event.target.dataset.element});
         }
-        if (this.deleteButtons) {
+        if (this.deleteButtons && !button ) {
             button = this.deleteButtons.find( item => { return item.nameId === event.target.dataset.element});
         }
 
@@ -67,18 +67,20 @@ export default class PagePlan {
 
     deletePlan = (event) => {
         this.deleteData(event.detail.id)
-            .then(resolve => { console.log(resolve) });
+            .then(resolve => { /*console.log(resolve)*/ });
     }
     
     formattedDataforSave (item) {
         item.subdivisionId = item.subdivision;
-        item.creationTime = "{{start}}";
+        item.creationTime = moment().format('YYYY-MM-DD');
 
-        const dates = getStrDateFromYearKvartal(item.year, item.kvartal);
-        item.periodStart = dates.start;
-        item.periodEnd = dates.end;
+        if ( !item.periodStart || !item.periodEnd) {
+            const dates = getStrDateFromYearKvartal(item.year, item.kvartal);
+            item.periodStart = dates.start;
+            item.periodEnd = dates.end;
+        }
         
-        item.userId = 1; //TODO: дописать сохранение записи под авторизованным пользователем
+        item.userId = localStorage.getItem("authid");
 
         delete item.kvartal;
         delete item.year;
@@ -99,69 +101,129 @@ export default class PagePlan {
                 && plan.planConsumptionDt > 0
             ) {  
             this.saveData(plan)
-                .then(resolve => { console.log(resolve) });
+                .then(resolve => { /*console.log(resolve)*/ });
+        }
+    }
+
+    afterSave = (event) => {
+
+        $.notify(
+        {
+            icon: "tim-icons " + event.detail.icon,
+            message: event.detail.text
+        },{
+            type: event.detail.style,
+            timer: 8000,
+            placement: {
+                from: "bottom",
+                align: "center"
+            }
+        });
+    }
+
+    dispatchEventAfterEdit (text, styleMessage, icon, closeModalWindow = false, updateItem = {} ) {
+        this.modalWindow.element.dispatchEvent(new CustomEvent("afterSave", {
+            detail: { 
+                "text": text,
+                "style": styleMessage,
+                "icon": icon
+            }
+        }));
+
+        if ( closeModalWindow ) {
+            this.modalWindow.close();
+        }
+
+        if ( updateItem ) {
+            switch (updateItem.action) {
+                case "save":
+                    const newItem =  this.formattedDataforSave(updateItem.item);
+                    newItem.subdivision = newItem.subdivisionId;
+
+                    this.plans.push(newItem);
+                    this.sortingPlansArr();
+
+                    this.planTable.addRow(newItem);
+                break;
+                case "update":
+                    let indexForEdit = null;
+                    this.plans.map( (pln, index) => {
+                        if (pln.id == updateItem.item.id) { // === не ставить, неявное сравнение
+                            indexForEdit = index;
+                        }
+                    });
+
+                    const updItem = this.formattedDataforSave(updateItem.item);
+                    updItem.subdivision = updItem.subdivisionId;
+
+                    this.plans.splice(indexForEdit, 1, updItem);
+                    //this.sortingPlansArr ();
+
+                    this.planTable.updateRow(updItem);
+                break;
+                case "delete":                    
+                    let indexForDelete = null;
+                    this.plans.map( (pln, index) => {
+                        if (pln.id == updateItem.id) { // === не ставить, неявное сравнение
+                            indexForDelete = index;                           
+                        }
+                    });
+
+                    this.plans.splice(indexForDelete, 1);
+                    this.planTable.deleteRow(updateItem.id);
+                break;
+            }
         }
     }
 
     async saveData( pln ) { 
-        const urlsavePlan = new URL (URL_PLANS, URL_BACKEND);
-        
-        /*$.ajax({
-            type: "POST",
-            url: urlsavePlan,
-            data: JSON.stringify(pln),
-            success: function(dataResult) {                
-                let ts = JSON.parse(dataResult);            
-                console.log(ts)
-            },
-            error: function(er) {
-                console.log(er);
-            }
-        });*/
 
+        const idForEdit = pln.id ? '/'+pln.id : '';
+
+        const urlsavePlan = new URL (URL_PLANS + idForEdit, URL_BACKEND);
+        
         try {
             const result = await fetchJson( urlsavePlan, {
                 method: pln.id ? 'PATCH' : 'POST',
-                items: {
+                headers: {
+                    'Accept': 'application/json',
                     'Content-Type': 'application/json'
-                },
+                },                
                 body: JSON.stringify(pln)
             });
-            console.log(result);
-            //this.dispatchEventAfterSave(result.id);
+
+            this.dispatchEventAfterEdit (
+                "Успешно сохранено",
+                "info",
+                "icon-bell-55",
+                true,
+                {   action: pln.id ? 'update' : 'save', 
+                    item: result
+                }
+            );
+
         } catch (error) {
             console.error('Ошибка сохранения информации об элементе плана:', error);
+            this.dispatchEventAfterEdit ("Ошибка сохранения элемента плана: " + error, "danger", "icon-bell-55");
         }
     }
 
     async deleteData (planId) {
-        console.log('Удаление элемента плана id ', planId);
         const urldeletePlan = new URL (URL_PLANS + '/' + planId, URL_BACKEND);
-
-        /*$.ajax({
-            type: "DELETE",
-            url: urldeletePlan,
-            //data: JSON.stringify( {"id": planId} ),
-            success: function(dataResult) {                
-                let ts = JSON.parse(dataResult);            
-                console.log(ts)
-            },
-            error: function(er) {
-                console.log(er);
-            }
-        });*/
 
         try {
             const result = await fetchJson( urldeletePlan, {
                 method: 'DELETE',
-                items: {
+                headers: {
+                    'Accept': 'application/json',
                     'Content-Type': 'application/json'
-                }
+                }                
             });
-            console.log(result);
-            //this.dispatchEventAfterSave(result.id);
+            this.dispatchEventAfterEdit ("Успешно удалено", "info", "icon-bell-55", true, {action: "delete", id: planId});
+
         } catch (error) {
             console.error('Ошибка удаления элемента плана:', error);
+            this.dispatchEventAfterEdit ("Ошибка удаления элемента плана: " + error, "danger", "icon-bell-55", true);
         }
     }
 
@@ -184,244 +246,6 @@ export default class PagePlan {
         }
     }
     
-    //TODO: delete, test data
-    createTempData() {        
-        this.plans = [
-            {
-                "id": 1,
-                "user": {
-                    "id": 2,
-                    "firstName": "Igor1",
-                    "lastName": "Martynkin1",
-                    "email": "MartynkinIA1@alrosa.ru",
-                    "login": "MartynkinIA1",
-                    "subdivision": {
-                        "id": 1,
-                        "subdivisionName": "АДТ",
-                        "subdivisionFullName": "Алмаздортранс"
-                    },
-                    "userPassword": null,
-                    "apiToken": null
-                },
-                "subdivision": {
-                    "id": 1,
-                    "subdivisionName": "АДТ",
-                    "subdivisionFullName": "Алмаздортранс"
-                },
-                "creationTime": "2022-11-16",
-                "periodStart": "2022-01-01",
-                "periodEnd": "2022-03-31",
-                "planConsumptionGas": 155.0,
-                "planDistanceGas": 23.0,
-                "planConsumptionDt": 55.0,
-                "planDistanceDt": 0.0
-            },
-            {
-                "id": 2,
-                "user": {
-                    "id": 1,
-                    "firstName": "Igor",
-                    "lastName": "Martynkin",
-                    "email": "MartynkinIA@alrosa.ru",
-                    "login": "MartynkinIA",
-                    "subdivision": null,
-                    "userPassword": null,
-                    "apiToken": null
-                },
-                "subdivision": {
-                    "id": 1,
-                    "subdivisionName": "АДТ",
-                    "subdivisionFullName": "Алмаздортранс"
-                },
-                "creationTime": "2022-01-01",
-                "periodStart": "2022-04-01",
-                "periodEnd": "2022-06-30",
-                "planConsumptionGas": 255.0,
-                "planDistanceGas": 223.0,
-                "planConsumptionDt": 255.0,
-                "planDistanceDt": 225.0
-            },
-            {
-                "id": 3,
-                "user": {
-                    "id": 2,
-                    "firstName": "Igor1",
-                    "lastName": "Martynkin1",
-                    "email": "MartynkinIA1@alrosa.ru",
-                    "login": "MartynkinIA1",
-                    "subdivision": {
-                        "id": 1,
-                        "subdivisionName": "АДТ",
-                        "subdivisionFullName": "Алмаздортранс"
-                    },
-                    "userPassword": null,
-                    "apiToken": null
-                },
-                "subdivision": {
-                    "id": 1,
-                    "subdivisionName": "АДТ",
-                    "subdivisionFullName": "Алмаздортранс"
-                },
-                "creationTime": "2022-01-01",
-                "periodStart": "2022-07-01",
-                "periodEnd": "2022-09-30",
-                "planConsumptionGas": 355.0,
-                "planDistanceGas": 323.0,
-                "planConsumptionDt": 355.0,
-                "planDistanceDt": 325.0
-            },
-            {
-                "id": 4,
-                "user": {
-                    "id": 1,
-                    "firstName": "Igor",
-                    "lastName": "Martynkin",
-                    "email": "MartynkinIA@alrosa.ru",
-                    "login": "MartynkinIA",
-                    "subdivision": null,
-                    "userPassword": null,
-                    "apiToken": null
-                },
-                "subdivision": {
-                    "id": 1,
-                    "subdivisionName": "АДТ",
-                    "subdivisionFullName": "Алмаздортранс"
-                },
-                "creationTime": "2022-01-01",
-                "periodStart": "2022-10-01",
-                "periodEnd": "2022-12-31",
-                "planConsumptionGas": 455.0,
-                "planDistanceGas": 423.0,
-                "planConsumptionDt": 455.0,
-                "planDistanceDt": 425.0
-            },            
-            {
-                "id": 6,
-                "user": {
-                    "id": 1,
-                    "firstName": "Igor",
-                    "lastName": "Martynkin",
-                    "email": "MartynkinIA@alrosa.ru",
-                    "login": "MartynkinIA",
-                    "subdivision": null,
-                    "userPassword": null,
-                    "apiToken": null
-                },
-                "subdivision": {
-                    "id": 1,
-                    "subdivisionName": "АДТ",
-                    "subdivisionFullName": "Алмаздортранс"
-                },
-                "creationTime": "2023-01-01",
-                "periodStart": "2023-04-01",
-                "periodEnd": "2023-06-30",
-                "planConsumptionGas": 255.0,
-                "planDistanceGas": 223.0,
-                "planConsumptionDt": 255.0,
-                "planDistanceDt": 225.0
-            },
-            {
-                "id": 7,
-                "user": {
-                    "id": 2,
-                    "firstName": "Igor1",
-                    "lastName": "Martynkin1",
-                    "email": "MartynkinIA1@alrosa.ru",
-                    "login": "MartynkinIA1",
-                    "subdivision": {
-                        "id": 1,
-                        "subdivisionName": "АДТ",
-                        "subdivisionFullName": "Алмаздортранс"
-                    },
-                    "userPassword": null,
-                    "apiToken": null
-                },
-                "subdivision": {
-                    "id": 1,
-                    "subdivisionName": "АДТ",
-                    "subdivisionFullName": "Алмаздортранс"
-                },
-                "creationTime": "2022-01-01",
-                "periodStart": "2023-07-01",
-                "periodEnd": "2023-09-30",
-                "planConsumptionGas": 355.0,
-                "planDistanceGas": 323.0,
-                "planConsumptionDt": 355.0,
-                "planDistanceDt": 325.0
-            },
-            {
-                "id": 8,
-                "user": {
-                    "id": 1,
-                    "firstName": "Igor",
-                    "lastName": "Martynkin",
-                    "email": "MartynkinIA@alrosa.ru",
-                    "login": "MartynkinIA",
-                    "subdivision": null,
-                    "userPassword": null,
-                    "apiToken": null
-                },
-                "subdivision": {
-                    "id": 1,
-                    "subdivisionName": "АДТ",
-                    "subdivisionFullName": "Алмаздортранс"
-                },
-                "creationTime": "2022-01-01",
-                "periodStart": "2023-10-01",
-                "periodEnd": "2023-12-31",
-                "planConsumptionGas": 455.0,
-                "planDistanceGas": 423.0,
-                "planConsumptionDt": 455.0,
-                "planDistanceDt": 425.0
-            },
-            {
-                "id": 5,
-                "user": {
-                    "id": 2,
-                    "firstName": "Igor1",
-                    "lastName": "Martynkin1",
-                    "email": "MartynkinIA1@alrosa.ru",
-                    "login": "MartynkinIA1",
-                    "subdivision": {
-                        "id": 1,
-                        "subdivisionName": "АДТ",
-                        "subdivisionFullName": "Алмаздортранс"
-                    },
-                    "userPassword": null,
-                    "apiToken": null
-                },
-                "subdivision": {
-                    "id": 1,
-                    "subdivisionName": "АДТ",
-                    "subdivisionFullName": "Алмаздортранс"
-                },
-                "creationTime": "2022-11-16",
-                "periodStart": "2023-01-01",
-                "periodEnd": "2023-03-31",
-                "planConsumptionGas": 155.0,
-                "planDistanceGas": 23.0,
-                "planConsumptionDt": 55.0,
-                "planDistanceDt": 0.0
-            },
-        ];
-        this.subdivisions = [
-            {
-                "id": 3,
-                "subdivisionName": "АГОК",
-                "subdivisionFullName": "Айхальский Горнообогатительный Комбинат"
-            },
-            {
-                "id": 2,
-                "subdivisionName": "УГОК",
-                "subdivisionFullName": "Удачнинский Горнообогатительный Комбинат"
-            },
-            {   "id": 1,
-                "subdivisionName": "АДТ",
-                "subdivisionFullName": "Алмаздортранс"
-            },
-        ];
-    }
-
     createPlanList() {
         this.headers = [
             {
@@ -473,15 +297,22 @@ export default class PagePlan {
             },
         ]
 
-        this.plans.sort( (a, b) => {
+        this.sortingPlansArr();
+
+        return new CustomTable(this.headers, this.plans);
+    }
+
+    sortingPlansArr () {
+        this.plans.sort( (a, b) => {            
+            if (a.subdivision.subdivisionName > b.subdivision.subdivisionName )  return 1;
+            if (a.subdivision.subdivisionName < b.subdivision.subdivisionName )  return -1;
+
             const {month: monthA, year: yearA} = getYearKvartal(a.periodStart);
             const {month: monthB, year: yearB} = getYearKvartal(b.periodStart);
             if (yearA > yearB) return -1;
             if (yearA < yearB) return 1;
             if (yearA === yearB)  return monthA - monthB;
         });
-
-        return new CustomTable(this.headers, this.plans);
     }
 
     createForm( planToEdit ) {
@@ -562,7 +393,7 @@ export default class PagePlan {
                 clas: 'btn-success btn-round float-right mr-5',
                 //nameModalWindow: this.nameModalWindow,
                 nameId: 'savePlan',
-                type: 'submit', // закомментировать, чтобы увидеть ошибку отправки
+                //type: 'submit', // закомментировать, чтобы увидеть ошибку отправки
                 action: () => {
                     const nameEvent  = planToEdit ? 'saveExistPlan' : 'saveNewPlan';
                     const event = new CustomEvent(nameEvent);
@@ -575,7 +406,7 @@ export default class PagePlan {
     }
 
     createModalWindow() {
-        return new ModalWindow (this.nameModalWindow);
+        return new ModalWindow (this.nameModalWindow, "Плановые показатели");
     }
 
     createToolbarButtons() {
@@ -600,8 +431,6 @@ export default class PagePlan {
         this.plans = plans;
         this.subdivisions = subdivisions;
         this.nameModalWindow = 'modal-window-plans';
-
-        //this.createTempData();//TODO: delete, test data
 
         this.modalWindow = this.createModalWindow();
 
@@ -629,6 +458,8 @@ export default class PagePlan {
         });
 
         this.modalWindow.element.addEventListener('click', this.onModalWindowClick);
+
+        this.modalWindow.element.addEventListener('afterSave', this.afterSave);
 
         this.planTable.element.addEventListener('saveExistPlan', this.savePlan);
 

@@ -31,7 +31,19 @@ export default async function(url, params) {
     }
     
     try {
-        return await response.json();
+        let rezult; 
+
+        if ( params ) {
+            if ( params.method === 'DELETE' ) { 
+                rezult = await response.text(); 
+            } else {
+                rezult = await response.json(); 
+            }
+        } else {
+            rezult = await response.json();
+        }
+
+        return rezult;
     } catch (err) {
         throw new FetchError(response, null, err.message);
     }

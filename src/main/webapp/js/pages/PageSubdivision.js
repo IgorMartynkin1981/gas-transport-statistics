@@ -16,7 +16,7 @@ export default class PageSubdivision {
         if (this.formButtons) {
             button = this.formButtons.find( item => { return item.nameId === event.target.dataset.element});
         }
-        if (this.deleteButtons) {
+        if (this.deleteButtons && !button ) {
             button = this.deleteButtons.find( item => { return item.nameId === event.target.dataset.element});
         }
 
@@ -62,78 +62,127 @@ export default class PageSubdivision {
 
     deleteSubdv = (event) => {
         this.deleteData(event.detail.id)
-            .then(resolve => { console.log(resolve) });
+            .then(resolve => { /*console.log(resolve)*/ });
     }
-
 
     saveSubdv = (event) => {
         const subdv = this.form.getFormData();
 
         if ( subdv.subdivisionName && subdv.subdivisionFullName ) {  
             this.saveData(subdv)
-                .then(resolve => { console.log(resolve) });
+                .then(resolve => { /*console.log(resolve)*/ });
+        }
+    }
+
+    afterSave = (event) => {
+
+        $.notify(
+        {
+            icon: "tim-icons " + event.detail.icon,
+            message: event.detail.text
+        },{
+            type: event.detail.style,
+            timer: 8000,
+            placement: {
+                from: "bottom",
+                align: "center"
+            }
+        });
+    }
+
+    dispatchEventAfterEdit (text, styleMessage, icon, closeModalWindow = false, updateItem = {} ) {
+        this.modalWindow.element.dispatchEvent(new CustomEvent("afterSave", {
+            detail: { 
+                "text": text,
+                "style": styleMessage,
+                "icon": icon
+            }
+        }));
+
+        if ( closeModalWindow ) {
+            this.modalWindow.close();
+        }
+
+        if ( updateItem ) {
+            switch (updateItem.action) {
+                case "save":
+                    this.subdivisions.push(updateItem.item);
+                    this.subdvTable.addRow(updateItem.item);
+                break;
+                case "update":
+                    let indexForEdit = null;
+                    this.subdivisions.map( (sub, index) => {
+                        if (sub.id == updateItem.item.id) { // === не ставить, неявное сравнение
+                            indexForEdit = index;
+                        }
+                    });
+
+                    this.subdivisions.splice(indexForEdit, 1, updateItem.item);
+                    this.subdvTable.updateRow(updateItem.item);
+                break;
+                case "delete":                    
+                    let indexForDelete = null;
+                    this.subdivisions.map( (sub, index) => {
+                        if (sub.id == updateItem.id) { // === не ставить, неявное сравнение
+                            indexForDelete = index;                           
+                        }
+                    });
+
+                    this.subdivisions.splice(indexForDelete, 1);
+                    this.subdvTable.deleteRow(updateItem.id);
+                break;
+            }
         }
     }
 
     async saveData( sub ) { 
-        const urlSaveSubdv = new URL (URL_SUBDIVISION, URL_BACKEND);
-        
-        /*$.ajax({
-            type: sub.id ? "PATCH" : "POST",
-            url: urlSaveSubdv,
-            data: JSON.stringify(sub),
-            success: function(dataResult) {                
-                let ts = JSON.parse(dataResult);            
-                console.log(ts)
-            },
-            error: function(er) {
-                console.log(er);
-            }
-        });*/
+
+        const idForEdit = sub.id ? '/'+sub.id : '';
+
+        const urlSaveSubdv = new URL (URL_SUBDIVISION + idForEdit, URL_BACKEND);
 
         try {
             const result = await fetchJson( urlSaveSubdv, {
                 method: sub.id ? 'PATCH' : 'POST',
-                items: {
+                headers: {
+                    'Accept': 'application/json',
                     'Content-Type': 'application/json'
-                },
+                },                
                 body: JSON.stringify(sub)
             });
-            console.log(result);
-            //this.dispatchEventAfterSave(result.id);
+            
+            this.dispatchEventAfterEdit (
+                "Успешно сохранено",
+                "info",
+                "icon-bell-55",
+                true,
+                {   action: sub.id ? 'update' : 'save', 
+                    item: result
+                }
+            );
+
         } catch (error) {
             console.error('Ошибка сохранения информации о подразделении:', error);
+            this.dispatchEventAfterEdit ("Ошибка сохранения подразделения: " + error, "danger", "icon-bell-55");
         }
     }
 
     async deleteData (subId) {
-        console.log('Удаление подразделения id ', subId);
         const urlDeleteSubdv = new URL (URL_SUBDIVISION + '/' + subId, URL_BACKEND);
-
-        /*$.ajax({
-            type: "DELETE",
-            url: urlDeleteSubdv,
-            //data: JSON.stringify( {"id": subId} ),
-            success: function(dataResult) {                
-                let ts = JSON.parse(dataResult);            
-                console.log(ts)
-            },
-            error: function(er) {
-                console.log(er);
-            }
-        });*/
 
         try {
             const result = await fetchJson( urlDeleteSubdv, {
                 method: 'DELETE',
-                items: {
+                headers: {
+                    'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 }
             });
-            console.log(result);
-            //this.dispatchEventAfterSave(result.id);
+            this.dispatchEventAfterEdit ("Успешно удалено", "info", "icon-bell-55", true, {action: "delete", id: subId});
+            
         } catch (error) {
             console.error('Ошибка удаления подразделения:', error);
+            this.dispatchEventAfterEdit ("Ошибка удаления подразделения: " + error, "danger", "icon-bell-55", true);
         }
     }
 
@@ -145,7 +194,7 @@ export default class PageSubdivision {
 
             const [subdivisions] = await Promise.all( [promiseSubdivision] );
             
-            return [subdivisions];
+            return [subdivisions]; // при расширении этого массива ниже в catch return  добавить пустой массив
 
         } catch (error) {
             console.error (error);
@@ -153,22 +202,6 @@ export default class PageSubdivision {
         }
     }
     
-    //TODO: delete, test data
-    createTempData() {
-        this.subdivisions = [
-            {
-                "id": 1,
-                "subdivisionName": "АГОК",
-                "subdivisionFullName": "Айхальский Горнообогатительный Комбинат"
-            },
-            {
-                "id": 2,
-                "subdivisionName": "УГОК",
-                "subdivisionFullName": "Удачнинский Горнообогатительный Комбинат"
-            }
-        ];
-    }
-
     createSubdivisionList() {
         this.headers = [
             {
@@ -213,7 +246,7 @@ export default class PageSubdivision {
                 clas: 'btn-success btn-round float-right mr-5',
                 //nameModalWindow: this.nameModalWindow,
                 nameId: 'saveSubdv',
-                type: 'submit',
+                //type: 'submit', // закомментировать, чтобы увидеть ошибку отправки
                 action: () => {
                     const nameEvent  = subdvToEdit ? 'saveExistSubdv' : 'saveNewSubdv';
                     const event = new CustomEvent(nameEvent);
@@ -226,7 +259,7 @@ export default class PageSubdivision {
     }
 
     createModalWindow() {
-        return new ModalWindow (this.nameModalWindow);
+        return new ModalWindow (this.nameModalWindow, 'Подразделения');
     }
 
     createToolbarButtons() {
@@ -250,8 +283,6 @@ export default class PageSubdivision {
         const [subdivisions] = await this.loadData();
         this.subdivisions = subdivisions;
         this.nameModalWindow = 'modal-window-subdivisions';
-
-        //this.createTempData();//TODO: delete, test data
 
         this.modalWindow = this.createModalWindow();
 
@@ -279,6 +310,8 @@ export default class PageSubdivision {
         });
 
         this.modalWindow.element.addEventListener('click', this.onModalWindowClick);
+
+        this.modalWindow.element.addEventListener('afterSave', this.afterSave);
 
         this.subdvTable.element.addEventListener('saveExistSubdv', this.saveSubdv);
 

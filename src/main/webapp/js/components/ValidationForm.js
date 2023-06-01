@@ -53,7 +53,7 @@ export default class ValidationForm {
 	getSelectElement(item, curVal=-1) {
 		return `
 		<div class="form-group">			
-			<select class="form-control" data-element="${item.name}" name="${item.name}" >
+			<select class="form-control" data-element="${item.name}" name="${item.name}" style="transition: none" >
 				<option value="-1"></option>
 				${ item.selectorItems.map( option => {
 					return `<option value="${option.id}" ${ curVal === option.id ? `selected` : `` }>${option.title}</option>`

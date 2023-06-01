@@ -24,10 +24,12 @@ export default class CustomTable {
                 formatedfield
             }   
         ] = [],
-        data = []
+        data = [],
+        idTableDOM = 'factListtest'
     ){
         this.headers = headers;
         this.data = data;
+        //this.idTableDOM = idTableDOM;
 
         this.render();
     }
@@ -60,7 +62,7 @@ export default class CustomTable {
                 </tbody>
                 <tfoot>
 				</tfoot>
-            </table>            
+            </table>
         `;
     }
 
@@ -85,7 +87,24 @@ export default class CustomTable {
             subElements[item.dataset.id] = item;
         }
 
+        const tableBody = element.querySelector('[data-element=tableBody]');
+        subElements["tableBody"] = tableBody;
+
         return subElements;
+    }
+
+    deleteRow( id ) {
+        this.subElements[id].remove();
+    }
+
+    addRow( item ) {
+        this.subElements.tableBody.innerHTML += this.getBodyRow(item);
+        this.subElements = this.getSubElements(this.element);
+    }
+    
+    updateRow( item ) {
+        this.subElements[item.id].outerHTML = this.getBodyRow(item);
+        this.subElements = this.getSubElements(this.element);
     }
 
     remove() {

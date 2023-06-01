@@ -19,7 +19,7 @@ export default class PageFact {
         if (this.formButtons) {
             button = this.formButtons.find( item => { return item.nameId === event.target.dataset.element});
         }
-        if (this.deleteButtons) {
+        if (this.deleteButtons && !button ) {
             button = this.deleteButtons.find( item => { return item.nameId === event.target.dataset.element});
         }
 
@@ -67,33 +67,33 @@ export default class PageFact {
 
     deleteFact = (event) => {
         this.deleteData(event.detail.id)
-            .then(resolve => { console.log(resolve) });
+            .then(resolve => { /*console.log(resolve)*/ });
     }
     
     formattedDataforSave (item) {
-        item.subdivisionId = item.subdivisionId;
-        item.creationTime = "{{start}}";
+        //item.subdivisionId =  item.subdivision;
+        item.creationTime = moment().format('YYYY-MM-DD');
 
-        const yearRegExp = /(?<=_).*/;
-        const year = Number(item.week.match(yearRegExp));
+        if ( !item.periodStart || !item.periodEnd) {
+            const yearRegExp = /(?<=_).*/;
+            const year = Number(item.week.match(yearRegExp));
 
-        const weeks = getWeeksArray (year);
-        const saveWeek = weeks.find( curWeek => {return curWeek.id === item.week} );
-        item.periodStart = saveWeek.startDate.format('YYYY-MM-DD');
-        item.periodEnd = saveWeek.stopDate.format('YYYY-MM-DD');
+            const weeks = getWeeksArray (year);
+            const saveWeek = weeks.find( curWeek => {return curWeek.id === item.week} );
+            item.periodStart = saveWeek.startDate.format('YYYY-MM-DD');
+            item.periodEnd = saveWeek.stopDate.format('YYYY-MM-DD');
+        }
 
-        item.userId = 1; //TODO: дописать сохранение записи под авторизованным пользователем
+        item.userId = localStorage.getItem("authid");
 
         delete item.week;
-        delete item.subdivision;
+        //delete item.subdivision;
 
         return item;
     }
 
     saveFact = (event) => {
         const fact = this.formattedDataforSave( this.form.getFormData() );
-
-        console.log(fact);
 
         if (    fact.periodStart 
                 && fact.periodEnd 
@@ -104,69 +104,129 @@ export default class PageFact {
                 && fact.consumptionDt > 0
             ) {  
             this.saveData(fact)
-                .then(resolve => { console.log("succes", resolve) });
+                .then(resolve => { /*console.log("succes", resolve)*/ });
         }
     }
 
-    async saveData( fct ) { 
-        const urlsaveFact = new URL (URL_FACTS, URL_BACKEND);
-        
-        /*$.ajax({
-            type: "POST",
-            url: urlsaveFact,
-            data: JSON.stringify(pln),
-            success: function(dataResult) {                
-                let ts = JSON.parse(dataResult);            
-                console.log(ts)
-            },
-            error: function(er) {
-                console.log(er);
+    
+    afterSave = (event) => {
+
+        $.notify(
+        {
+            icon: "tim-icons " + event.detail.icon,
+            message: event.detail.text
+        },{
+            type: event.detail.style,
+            timer: 8000,
+            placement: {
+                from: "bottom",
+                align: "center"
             }
-        });*/
+        });
+    }
+
+    dispatchEventAfterEdit (text, styleMessage, icon, closeModalWindow = false, updateItem = {} ) {
+        this.modalWindow.element.dispatchEvent(new CustomEvent("afterSave", {
+            detail: { 
+                "text": text,
+                "style": styleMessage,
+                "icon": icon
+            }
+        }));
+
+        if ( closeModalWindow ) {
+            this.modalWindow.close();
+        }
+
+        if ( updateItem ) {
+            switch (updateItem.action) {
+                case "save":
+                    const newItem =  this.formattedDataforSave(updateItem.item);
+
+                    this.facts.push(newItem);
+
+                    this.sortingFactsArr();
+
+                    this.factTable.addRow(newItem);
+                break;
+                case "update":
+                    let indexForEdit = null;
+                    this.facts.map( (fct, index) => {
+                        if (fct.id == updateItem.item.id) { // === не ставить, неявное сравнение
+                            indexForEdit = index;
+                        }
+                    });
+
+                    const updItem = this.formattedDataforSave(updateItem.item);
+
+                    this.facts.splice(indexForEdit, 1, updItem);
+                    this.sortingFactsArr();
+
+                    this.factTable.updateRow(updItem);
+                break;
+                case "delete":                    
+                    let indexForDelete = null;
+                    this.facts.map( (fct, index) => {
+                        if (fct.id == updateItem.id) { // === не ставить, неявное сравнение
+                            indexForDelete = index;                           
+                        }
+                    });
+
+                    this.facts.splice(indexForDelete, 1);
+                    this.factTable.deleteRow(updateItem.id);
+                break;
+            }
+        }
+    }
+
+    async saveData( fct ) {
+
+        const idForEdit = fct.id ? '/'+fct.id : '';
+
+        const urlsaveFact = new URL (URL_FACTS + idForEdit, URL_BACKEND);
 
         try {
             const result = await fetchJson( urlsaveFact, {
                 method: fct.id ? 'PATCH' : 'POST',
-                items: {
+                headers: {
+                    'Accept': 'application/json',
                     'Content-Type': 'application/json'
-                },
+                },                
                 body: JSON.stringify(fct)
             });
-            console.log("succes",result);
-            //this.dispatchEventAfterSave(result.id);
+
+            this.dispatchEventAfterEdit (
+                "Успешно сохранено",
+                "info",
+                "icon-bell-55",
+                true,
+                {   action: fct.id ? 'update' : 'save', 
+                    item: result
+                }
+            );
+            
         } catch (error) {
             console.error('Ошибка сохранения информации об элементе плана:', error);
+            this.dispatchEventAfterEdit ("Ошибка сохранения элемента плана: " + error, "danger", "icon-bell-55");
         }
     }
 
     async deleteData (factId) {
-        console.log('Удаление элемента плана id ', factId);
         const urldeleteFact = new URL (URL_FACTS + '/' + factId, URL_BACKEND);
-
-        /*$.ajax({
-            type: "DELETE",
-            url: urldeleteFact,
-            //data: JSON.stringify( {"id": factId} ),
-            success: function(dataResult) {                
-                let ts = JSON.parse(dataResult);            
-                console.log(ts)
-            },
-            error: function(er) {
-                console.log(er);
-            }
-        });*/
 
         try {
             const result = await fetchJson( urldeleteFact, {
                 method: 'DELETE',
-                items: {
+                headers: {
+                    'Accept': 'application/json',
                     'Content-Type': 'application/json'
-                }
+                }                
             });
-            console.log(result);
-            //this.dispatchEventAfterSave(result.id);
+            this.dispatchEventAfterEdit ("Успешно удалено", "info", "icon-bell-55", true, {action: "delete", id: factId});
+
         } catch (error) {
             console.error('Ошибка удаления элемента плана:', error);
+            this.dispatchEventAfterEdit ("Ошибка удаления элемента плана: " + error, "danger", "icon-bell-55", true);
         }
     }
 
@@ -187,269 +247,6 @@ export default class PageFact {
             console.error (error);
             return [ [],[] ];
         }
-    }
-    
-    //TODO: delete, test data
-    createTempData() {        
-        this.facts = [           
-            {
-                "id": 9,
-                "user": {
-                    "id": 1,
-                    "firstName": "Igor",
-                    "lastName": "Martynkin",
-                    "email": "MartynkinIA@alrosa.ru",
-                    "login": "MartynkinIA",
-                    "subdivision": null,
-                    "userPassword": null,
-                    "apiToken": null
-                },
-                "subdivision": {
-                    "id": 1,
-                    "subdivisionName": "АДТ",
-                    "subdivisionFullName": "Алмаздортранс"
-                },
-                "creationTime": "2022-01-01",
-                "periodStart": "2022-09-26",
-                "periodEnd": "2022-10-02",
-                "consumptionGas": 255.0,
-                "distanceGas": 223.0,
-                "consumptionDt": 255.0,
-                "distanceDt": 225.0
-            }, 
-            {
-                "id": 2,
-                "user": {
-                    "id": 1,
-                    "firstName": "Igor",
-                    "lastName": "Martynkin",
-                    "email": "MartynkinIA@alrosa.ru",
-                    "login": "MartynkinIA",
-                    "subdivision": null,
-                    "userPassword": null,
-                    "apiToken": null
-                },
-                "subdivision": {
-                    "id": 1,
-                    "subdivisionName": "АДТ",
-                    "subdivisionFullName": "Алмаздортранс"
-                },
-                "creationTime": "2022-01-01",
-                "periodStart": "2022-11-07",
-                "periodEnd": "2022-11-13",
-                "consumptionGas": 255.0,
-                "distanceGas": 223.0,
-                "consumptionDt": 255.0,
-                "distanceDt": 225.0
-            },
-            {
-                "id": 3,
-                "user": {
-                    "id": 2,
-                    "firstName": "Igor1",
-                    "lastName": "Martynkin1",
-                    "email": "MartynkinIA1@alrosa.ru",
-                    "login": "MartynkinIA1",
-                    "subdivision": {
-                        "id": 1,
-                        "subdivisionName": "АДТ",
-                        "subdivisionFullName": "Алмаздортранс"
-                    },
-                    "userPassword": null,
-                    "apiToken": null
-                },
-                "subdivision": {
-                    "id": 1,
-                    "subdivisionName": "АДТ",
-                    "subdivisionFullName": "Алмаздортранс"
-                },
-                "creationTime": "2022-01-01",
-                "periodStart": "2022-11-14",
-                "periodEnd": "2022-11-20",
-                "consumptionGas": 355.0,
-                "distanceGas": 323.0,
-                "consumptionDt": 355.0,
-                "distanceDt": 325.0
-            },
-            {
-                "id": 1,
-                "user": {
-                    "id": 2,
-                    "firstName": "Igor1",
-                    "lastName": "Martynkin1",
-                    "email": "MartynkinIA1@alrosa.ru",
-                    "login": "MartynkinIA1",
-                    "subdivision": {
-                        "id": 1,
-                        "subdivisionName": "АДТ",
-                        "subdivisionFullName": "Алмаздортранс"
-                    },
-                    "userPassword": null,
-                    "apiToken": null
-                },
-                "subdivision": {
-                    "id": 1,
-                    "subdivisionName": "АДТ",
-                    "subdivisionFullName": "Алмаздортранс"
-                },
-                "creationTime": "2022-10-31",
-                "periodStart": "2022-10-31",
-                "periodEnd": "2022-11-06",
-                "consumptionGas": 155.0,
-                "distanceGas": 23.0,
-                "consumptionDt": 55.0,
-                "distanceDt": 0.0
-            },
-            {
-                "id": 4,
-                "user": {
-                    "id": 1,
-                    "firstName": "Igor",
-                    "lastName": "Martynkin",
-                    "email": "MartynkinIA@alrosa.ru",
-                    "login": "MartynkinIA",
-                    "subdivision": null,
-                    "userPassword": null,
-                    "apiToken": null
-                },
-                "subdivision": {
-                    "id": 1,
-                    "subdivisionName": "АДТ",
-                    "subdivisionFullName": "Алмаздортранс"
-                },
-                "creationTime": "2022-01-01",
-                "periodStart": "2022-11-21",
-                "periodEnd": "2022-11-27",
-                "consumptionGas": 455.0,
-                "distanceGas": 423.0,
-                "consumptionDt": 455.0,
-                "distanceDt": 425.0
-            },            
-            {
-                "id": 6,
-                "user": {
-                    "id": 1,
-                    "firstName": "Igor",
-                    "lastName": "Martynkin",
-                    "email": "MartynkinIA@alrosa.ru",
-                    "login": "MartynkinIA",
-                    "subdivision": null,
-                    "userPassword": null,
-                    "apiToken": null
-                },
-                "subdivision": {
-                    "id": 1,
-                    "subdivisionName": "АДТ",
-                    "subdivisionFullName": "Алмаздортранс"
-                },
-                "creationTime": "2022-01-01",
-                "periodStart": "2022-11-28",
-                "periodEnd": "2022-12-04",
-                "consumptionGas": 255.0,
-                "distanceGas": 223.0,
-                "consumptionDt": 255.0,
-                "distanceDt": 225.0
-            },
-            {
-                "id": 7,
-                "user": {
-                    "id": 2,
-                    "firstName": "Igor1",
-                    "lastName": "Martynkin1",
-                    "email": "MartynkinIA1@alrosa.ru",
-                    "login": "MartynkinIA1",
-                    "subdivision": {
-                        "id": 1,
-                        "subdivisionName": "АДТ",
-                        "subdivisionFullName": "Алмаздортранс"
-                    },
-                    "userPassword": null,
-                    "apiToken": null
-                },
-                "subdivision": {
-                    "id": 1,
-                    "subdivisionName": "АДТ",
-                    "subdivisionFullName": "Алмаздортранс"
-                },
-                "creationTime": "2022-01-01",
-                "periodStart": "2022-12-05",
-                "periodEnd": "2022-12-11",
-                "consumptionGas": 355.0,
-                "distanceGas": 323.0,
-                "consumptionDt": 355.0,
-                "distanceDt": 325.0
-            },
-            {
-                "id": 8,
-                "user": {
-                    "id": 1,
-                    "firstName": "Igor",
-                    "lastName": "Martynkin",
-                    "email": "MartynkinIA@alrosa.ru",
-                    "login": "MartynkinIA",
-                    "subdivision": null,
-                    "userPassword": null,
-                    "apiToken": null
-                },
-                "subdivision": {
-                    "id": 1,
-                    "subdivisionName": "АДТ",
-                    "subdivisionFullName": "Алмаздортранс"
-                },
-                "creationTime": "2022-01-01",
-                "periodStart": "2022-12-12",
-                "periodEnd": "2022-12-18",
-                "consumptionGas": 455.0,
-                "distanceGas": 423.0,
-                "consumptionDt": 455.0,
-                "distanceDt": 425.0
-            },
-            {
-                "id": 5,
-                "user": {
-                    "id": 2,
-                    "firstName": "Igor1",
-                    "lastName": "Martynkin1",
-                    "email": "MartynkinIA1@alrosa.ru",
-                    "login": "MartynkinIA1",
-                    "subdivision": {
-                        "id": 1,
-                        "subdivisionName": "АДТ",
-                        "subdivisionFullName": "Алмаздортранс"
-                    },
-                    "userPassword": null,
-                    "apiToken": null
-                },
-                "subdivision": {
-                    "id": 1,
-                    "subdivisionName": "АДТ",
-                    "subdivisionFullName": "Алмаздортранс"
-                },
-                "creationTime": "2022-11-16",
-                "periodStart": "2022-12-19",
-                "periodEnd": "2022-12-25",
-                "consumptionGas": 155.0,
-                "distanceGas": 23.0,
-                "consumptionDt": 55.0,
-                "distanceDt": 0.0
-            },
-        ];
-        this.subdivisions = [
-            {
-                "id": 3,
-                "subdivisionName": "АГОК",
-                "subdivisionFullName": "Айхальский Горнообогатительный Комбинат"
-            },
-            {
-                "id": 2,
-                "subdivisionName": "УГОК",
-                "subdivisionFullName": "Удачнинский Горнообогатительный Комбинат"
-            },
-            {   "id": 1,
-                "subdivisionName": "АДТ",
-                "subdivisionFullName": "Алмаздортранс"
-            },
-        ];
     }
 
     createFactList() {
@@ -503,13 +300,22 @@ export default class PageFact {
             },
         ]
 
+        this.sortingFactsArr();
+
+        //console.log(this.facts);
+
+        return new CustomTable(this.headers, this.facts, 'factListtest');
+    }
+
+    sortingFactsArr() {
         this.facts.sort( (a, b) => {
+            if (a.subdivision.subdivisionName > b.subdivision.subdivisionName )  return 1;
+            if (a.subdivision.subdivisionName < b.subdivision.subdivisionName )  return -1;
+
             if ( a.periodStart > b.periodStart ) return -1;
             if ( a.periodStart === b.periodStart ) return 0;
             if ( a.periodStart < b.periodStart ) return 1;            
         });
-
-        return new CustomTable(this.headers, this.facts);
     }
 
     createForm( factToEdit ) {
@@ -571,7 +377,7 @@ export default class PageFact {
                 clas: 'btn-success btn-round float-right mr-5',
                 //nameModalWindow: this.nameModalWindow,
                 nameId: 'saveFact',
-                type: 'submit', // закомментировать, чтобы увидеть ошибку отправки
+                //type: 'submit', // закомментировать, чтобы увидеть ошибку отправки
                 action: () => {
                     const nameEvent  = factToEdit ? 'saveExistFact' : 'saveNewFact';
                     const event = new CustomEvent(nameEvent);
@@ -584,7 +390,7 @@ export default class PageFact {
     }
 
     createModalWindow() {
-        return new ModalWindow (this.nameModalWindow);
+        return new ModalWindow (this.nameModalWindow, "Еженедельные показатели");
     }
 
     createToolbarButtons() {
@@ -609,8 +415,6 @@ export default class PageFact {
         this.facts = facts;
         this.subdivisions = subdivisions;
         this.nameModalWindow = 'modal-window-facts';
-
-        //this.createTempData();//TODO: delete, test data
 
         this.modalWindow = this.createModalWindow();
 
@@ -638,6 +442,8 @@ export default class PageFact {
         });
 
         this.modalWindow.element.addEventListener('click', this.onModalWindowClick);
+
+        this.modalWindow.element.addEventListener('afterSave', this.afterSave);
 
         this.factTable.element.addEventListener('saveExistFact', this.saveFact);
 

@@ -1,6 +1,7 @@
 import Sidebar from './components/Sidebar.js';
 import Navbar from './components/Navbar.js';
 import getUrlParams from './utils/get-url-params.js';
+import Auth from './utils/Auth.js';
 
 const mainColor = 'green';   //blue | green | orange | red 
 
@@ -64,12 +65,13 @@ wrapper.prepend(sidebar.button, sidebar.menu);
 mainPanel.setAttribute('data', mainColor);
 mainPanel.prepend(navbar.element);
 
-/*const page = new URL(window.location).pathname;
-console.log(page);
-//import(`/js/pages/${getUrlParams()[page]}.js`);*/
-
 moment.updateLocale('ru', {
     week: {
       dow: 1, // Monday is the first day of the week.
     }
+});
+
+const auth = new Auth();
+document.querySelector(".logout").addEventListener("click", (e) => {
+    auth.logOut();
 });

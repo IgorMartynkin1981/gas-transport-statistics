@@ -1,40 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="/css/style.min.css">
-    <script defer src="js/loginout/login.js">//Вызывайте класс аутентификации на каждой странице - добавьте init.js досье. https://dev.to/thedevdrawer/login-validation-authentication-using-vanilla-javascript-4i45</script>
-    <script defer src="js/init.js"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-icon.png">
+    <link rel="icon" type="image/png" href="/img/favicon.png">
+    <title>
+        Портал показателей газового транспорта
+    </title>
+
+    <link href="/css/black-dashboard/black-dashboard.min.css?v=1.1.1" rel="stylesheet" />
+    <link href="/css/black-dashboard/nucleo-icons.css" rel="stylesheet">
+    <script src="/js/utils/md5.min.js"></script>
+
+    
 </head>
-<body>
-    <div class="container">
-        <h1 class="text-center">Welcome to the Dashboard</h1>
-        <p class="text-center"><a href="#" class="logout">Log Out</a></p>
+<body class="sidebar-mini white-content">   
+    <div class="wrapper">
+        <div class="main-panel" data="green">
+            <div class="content">
+                <div class="col-md-8 ml-auto mr-auto">
+                <h2 class="text-center">Авторизация в системе</h2>
+                </div>
+            </div>			
+            <footer class="footer"> 
+            </footer>
+        </div>
     </div>
 
+        <!--   Core JS Files   -->
+        <script src="/js/black-dashboard/core/jquery.min.js"></script>
+        <script src="/js/black-dashboard/core/popper.min.js"></script>
+        <script src="/js/black-dashboard/core/bootstrap.min.js"></script>
+        <script src="/js/black-dashboard/plugins/perfect-scrollbar.jquery.min.js"></script>
+        <script src="/js/black-dashboard/plugins/moment.min.js"></script>
+        <!--  Plugin for Switches, full documentation here: http://www.jque.re/plugins/version3/bootstrap.switch/ -->
+        <script src="/js/black-dashboard/plugins/bootstrap-switch.js"></script>
+        <!--  Plugin for Sweet Alert -->
+        <script src="/js/black-dashboard/plugins/sweetalert2.min.js"></script>
+        <!--  Plugin for Sorting Tables -->
+        <script src="/js/black-dashboard/plugins/jquery.tablesorter.js"></script>
+        <!-- Forms Validations Plugin -->
+        <script src="/js/black-dashboard/plugins/jquery.validate.min.js"></script>
+        <!--  Plugin for the Wizard, full documentation here: https://github.com/VinceG/twitter-bootstrap-wizard -->
+        <script src="/js/black-dashboard/plugins/jquery.bootstrap-wizard.js"></script>
+        <!--	Plugin for Select, full documentation here: http://silviomoreto.github.io/bootstrap-select -->
+        <script src="/js/black-dashboard/plugins/bootstrap-selectpicker.js"></script>
+        <!--  Plugin for the DateTimePicker, full documentation here: https://eonasdan.github.io/bootstrap-datetimepicker/ -->
+        <script src="/js/black-dashboard/plugins/bootstrap-datetimepicker.js"></script>
+        <!--  DataTables.net Plugin, full documentation here: https://datatables.net/    -->
+        <script src="/js/black-dashboard/plugins/jquery.dataTables.min.js"></script>
+        <!--	Plugin for Tags, full documentation here: https://github.com/bootstrap-tagsinput/bootstrap-tagsinputs  -->
+        <script src="/js/black-dashboard/plugins/bootstrap-tagsinput.js"></script>
+        <!-- Plugin for Fileupload, full documentation here: http://www.jasny.net/bootstrap/javascript/#fileinput -->
+        <script src="/js/black-dashboard/plugins/jasny-bootstrap.min.js"></script>
+        <!--  Full Calendar Plugin, full documentation here: https://github.com/fullcalendar/fullcalendar    -->
+        <script src="/js/black-dashboard/plugins/fullcalendar/fullcalendar.min.js"></script>
+        <script src="/js/black-dashboard/plugins/fullcalendar/daygrid.min.js"></script>
+        <script src="/js/black-dashboard/plugins/fullcalendar/timegrid.min.js"></script>
+        <script src="/js/black-dashboard/plugins/fullcalendar/interaction.min.js"></script>
+        <!-- Vector Map plugin, full documentation here: http://jvectormap.com/documentation/ -->
+        <script src="/js/black-dashboard/plugins/jquery-jvectormap.js"></script>
+        <!--  Plugin for the Sliders, full documentation here: http://refreshless.com/nouislider/ -->
+        <script src="/js/black-dashboard/plugins/nouislider.min.js"></script>
+        <!-- Chart JS -->
+        <script src="/js/black-dashboard/plugins/chartjs.min.js"></script>
+        <!--  Notifications Plugin    -->
+        <script src="/js/black-dashboard/plugins/bootstrap-notify.js"></script>
+        <!-- Control Center for Black Dashboard: parallax effects, scripts for the example pages etc -->
+        <script src="/js/black-dashboard/black-dashboard.min.js?v=1.1.1"></script>
 
-    <div class="container">
-        <h2 class="text-center">Login</h2>
-        <br>
-        <form action="/dashboard.html" class="loginForm">
-            <div class="input-group">
-                <label for="username" class="label">Username</label>
-                <input type="text" id="username" class="input">
-                <span class="error-message"></span>
-            </div>
-            <br>
-            <div class="input-group">
-                <label for="password" class="label">Password</label>
-                <input type="password" id="password" class="input">
-                <span class="error-message"></span>
-            </div>
-            <br>
-            <button class="button" type="submit">Login</button>
-        </form>
-    </div>
-
+        <script type="module" src="/js/init.js"></script>
 </body>
 </html>

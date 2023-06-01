@@ -1,11 +1,12 @@
 export default class ModalWindow {
 
-    constructor ( 
-        nameModalWindow = '', 
-        contentElement = document.createElement("div") 
+    constructor (
+            nameModalWindow = '',            
+            headerModalWindow = 'Действие'
     ){
         this.nameModalWindow = nameModalWindow;
-		this.contentElement = contentElement;		
+        this.headerModalWindow = headerModalWindow;
+		this.contentElement = document.createElement("div");		
 		this.render();
     }
 
@@ -13,8 +14,16 @@ export default class ModalWindow {
         return `
         <div class="modal fade ${this.nameModalWindow}" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
-                <div data-element="modalContent" class="modal-content">
-                ${content}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" data-element="modalCloseButton" class="close" data-dismiss="modal" aria-hidden="true">
+                        <i class="tim-icons icon-simple-remove"></i>
+                        </button>
+                        <h3 class="modal-title" id="myModalLabel"> ${this.headerModalWindow} </h3>
+                    </div>
+                    <div class="modal-body" data-element="modalBody" >
+                        ${content}   
+                    </div>                    
                 </div>
             </div>
         </div>
@@ -30,7 +39,7 @@ export default class ModalWindow {
     }
 
     update(newContent) {
-        this.subElements.modalContent.innerHTML = newContent.outerHTML;
+        this.subElements.modalBody.innerHTML = newContent.outerHTML;
     }
 
     getSubElements(element) {
@@ -42,6 +51,10 @@ export default class ModalWindow {
         }
 
         return subElements;
+    }
+
+    close(){
+        this.subElements.modalCloseButton.dispatchEvent(new Event('click', {bubbles: true}));
     }
 
     remove() {

@@ -23,7 +23,7 @@ export default function(stringDate) {
     */
     const weeks = getWeeksArray( date.year() );
 
-    console.log(weeks);
+    //console.log('все возможные недели этого года:', weeks);
 
     const wk = Object.values( weeks ).find( item => {
 
@@ -33,7 +33,7 @@ export default function(stringDate) {
         if (item.startDate.valueOf() <= date.valueOf() && item.stopDate.valueOf() >= date.valueOf()) return true;
     });
 
-    console.log(wk);
+    //console.log('искомая неделя' + stringDate, wk);
 
     result.numWeek = wk.id;
     result.start = wk.startDate;

@@ -16,14 +16,14 @@ export default class PageUsers {
         if (this.formButtons) {
             button = this.formButtons.find( item => { return item.nameId === event.target.dataset.element});
         }
-        if (this.deleteButtons) {
+        if (this.deleteButtons && !button ) {
             button = this.deleteButtons.find( item => { return item.nameId === event.target.dataset.element});
         }
 
         if ( button ) {
             const fnAction = button.action.bind(this);
             fnAction();
-        };
+        }; 
     }
 
     showWindowEditUser = (idEdit) => {
@@ -62,91 +62,136 @@ export default class PageUsers {
 
     deleteUser = (event) => {
         this.deleteData(event.detail.id)
-            .then(resolve => { console.log(resolve) });
+            .then(resolve => { /*console.log(resolve)*/ });
     }
 
     saveUser = (event) => {
-        const user = this.form.getFormData();
-
-        console.log(user);
+        const user = this.form.getFormData(); 
         
         if ( user.subdivision === -1 || !user.subdivision ) {
-            delete user.subdivision ;
+            delete user.subdivision;
         }
         if ( user.password === '' || !user.password ) {
             delete user.password; 
         }
 
-        if ( user.userName && user.password && user.lastName && user.firstName && user.login && user.email.indexOf('@') > 0) {
+        if ( user.lastName && user.firstName && user.login && user.email.indexOf('@') > 0) {  
             this.saveData(user)
-                .then(resolve => { console.log(resolve) });
+                .then(resolve => { /*console.log(resolve) */});
+        }
+    }
+
+    afterSave = (event) => {
+
+        $.notify(
+        {
+            icon: "tim-icons " + event.detail.icon,
+            message: event.detail.text
+        },{
+            type: event.detail.style,
+            timer: 8000,
+            placement: {
+                from: "bottom",
+                align: "center"
+            }
+        });
+    }
+
+    dispatchEventAfterEdit (text, styleMessage, icon, closeModalWindow = false, updateItem = {} ) { console.log(updateItem);
+        this.modalWindow.element.dispatchEvent(new CustomEvent("afterSave", {
+            detail: { 
+                "text": text,
+                "style": styleMessage,
+                "icon": icon
+            }
+        }));
+
+        if ( closeModalWindow ) {
+            this.modalWindow.close();
+        }
+
+        if ( updateItem ) {
+            switch (updateItem.action) {
+                case "save":
+                    this.users.push(updateItem.item);
+                    this.userTable.addRow(updateItem.item);
+                break;
+                case "update":
+                    let indexForEdit = null;
+                    this.users.map( (usr, index) => {
+                        if (usr.id == updateItem.item.id) { // === не ставить, неявное сравнение
+                            indexForEdit = index;
+                        }
+                    });
+
+                    this.users.splice(indexForEdit, 1, updateItem.item);
+                    this.userTable.updateRow(updateItem.item);
+                break;
+                case "delete":                    
+                    let indexForDelete = null;
+                    this.users.map( (usr, index) => {
+                        if (usr.id == updateItem.id) { // === не ставить, неявное сравнение
+                            indexForDelete = index;                           
+                        }
+                    });
+
+                    this.users.splice(indexForDelete, 1);
+                    this.userTable.deleteRow(updateItem.id);
+                break;
+            }
         }
     }
 
     async saveData( usr ) {
-        const urlSaveUser = new URL ("/signup", "http://localhost:42727/user_console");
-        
-        /*$.ajax({
-            type: "POST",
-            url: urlSaveUser,
-            data: JSON.stringify(usr),
-            success: function(dataResult) {                
-                let ts = JSON.parse(dataResult);            
-                console.log(ts)
-            },
-            error: function(er) {
-                console.log(er);
-            }
-        });*/
 
+        const idForEdit = usr.id ? '/'+usr.id : '';
+
+        usr.subdivisionId = usr.subdivision;
+
+        const urlSaveUser = new URL (URL_USERS + idForEdit, URL_BACKEND);
         try {
             const result = await fetchJson( urlSaveUser, {
-                // method: usr.id ? 'PATCH' : 'POST',
-                method: 'POST',
+                method: usr.id ? 'PATCH' : 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                // items: {
-                //     'Content-Type': 'application/json'
-                // },
+
                 body: JSON.stringify(usr)
             });
-            console.log(result);
-            //this.dispatchEventAfterSave(result.id);
+
+            this.dispatchEventAfterEdit (
+                "Успешно сохранено",
+                "info",
+                "icon-bell-55",
+                true,
+                {   action: usr.id ? 'update' : 'save', 
+                    item: result
+                }
+            );
+
         } catch (error) {
             console.error('Ошибка сохранения информации о пользователе:', error);
+            this.dispatchEventAfterEdit ("Ошибка сохранения пользователя: " + error, "danger", "icon-bell-55");
         }
     }
 
-    async deleteData (usrId) {
-        console.log('Удаление пользователя id ', usrId);
+    async deleteData (usrId) {        
         const urlDeleteUser = new URL (URL_USERS + '/' + usrId, URL_BACKEND);
-
-        /*$.ajax({
-            type: "DELETE",
-            url: urlDeleteUser,
-            //data: JSON.stringify( {"id": usrId} ),
-            success: function(dataResult) {                
-                let ts = JSON.parse(dataResult);            
-                console.log(ts)
-            },
-            error: function(er) {
-                console.log(er);
-            }
-        });*/
 
         try {
             const result = await fetchJson( urlDeleteUser, {
                 method: 'DELETE',
-                items: {
+                headers: {
+                    'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 }
             });
-            console.log(result);
-            //this.dispatchEventAfterSave(result.id);
+            this.dispatchEventAfterEdit ("Успешно удалено", "info", "icon-bell-55", true, {action: "delete", id: usrId});
+            
         } catch (error) {
             console.error('Ошибка удаления пользователя:', error);
+            this.dispatchEventAfterEdit ("Ошибка удаления пользователя: " + error, "danger", "icon-bell-55", true);
         }
     }
 
@@ -168,44 +213,6 @@ export default class PageUsers {
         }
     }
     
-    //TODO: delete, test data
-    createTempData() {        
-        this.users = [
-            {
-                "id": 1,
-                "firstName": "Igor",
-                "lastName": "Martynkin",
-                "email": "MartynkinIA@alrosa.ru",
-                "login": "MartynkinIA",
-                "subdivision": null			//NOT INTEGER, if class SubDivision is Null, return null
-            },
-            {
-                "id": 2,
-                "firstName": "Igor1",
-                "lastName": "Martynkin1",
-                "email": "MartynkinIA1@alrosa.ru",
-                "login": "MartynkinIA1",
-                "subdivision": {			//NOT INTEGER, if class SubDivision not Null, return SubDivision class
-                    "id": 1,
-                    "subdivisionName": "АГОК",
-                    "subdivisionFullName": "Айхальский Горнообогатительный Комбинат"
-                }
-            }
-        ];
-        this.subdivisions = [
-            {
-                "id": 1,
-                "subdivisionName": "АГОК",
-                "subdivisionFullName": "Айхальский Горнообогатительный Комбинат"
-            },
-            {
-                "id": 2,
-                "subdivisionName": "УГОК",
-                "subdivisionFullName": "Удачнинский Горнообогатительный Комбинат"
-            }
-        ];
-    }
-
     createUserList() {
         this.headers = [
             {
@@ -264,7 +271,7 @@ export default class PageUsers {
             },
             {
                 title: 'Логин',
-                name: 'login',
+                name: 'username',
                 required: true,
                 type: 'text',
             },
@@ -299,7 +306,7 @@ export default class PageUsers {
     }
 
     createModalWindow() {
-        return new ModalWindow (this.nameModalWindow);
+        return new ModalWindow (this.nameModalWindow, "Пользователи");
     }
 
     createToolbarButtons() {
@@ -324,8 +331,6 @@ export default class PageUsers {
         this.users = users;
         this.subdivisions = subdivisions;
         this.nameModalWindow = 'modal-window-users';
-
-        //this.createTempData();//TODO: delete, test data
 
         this.modalWindow = this.createModalWindow();
 
@@ -353,6 +358,8 @@ export default class PageUsers {
         });
 
         this.modalWindow.element.addEventListener('click', this.onModalWindowClick);
+
+        this.modalWindow.element.addEventListener('afterSave', this.afterSave);
 
         this.userTable.element.addEventListener('saveExistUser', this.saveUser);
 

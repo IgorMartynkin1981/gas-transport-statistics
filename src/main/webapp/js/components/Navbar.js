@@ -46,7 +46,7 @@ export default class Navbar {
                         <a href="javascript:void(0)" class="nav-item dropdown-item">Сменить пароль</a>
                     </li>
                     <li class="nav-link">
-                        <a href="javascript:void(0)" class="nav-item dropdown-item">Выход</a>
+                        <a href="javascript:void(0)" class="nav-item dropdown-item logout">Выход</a>
                     </li>
                     </ul>
                 </li>

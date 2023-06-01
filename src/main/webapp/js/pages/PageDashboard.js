@@ -282,7 +282,7 @@ export default class PageDashboard {
         this.subdivisions = await this.loadSubdivisions();
 
         this.currentSubID = this.subdivisions[0].id;
-        this.currentYear = moment().year()-1;
+        this.currentYear = moment().year();
 
         this.toolbarSubdiv = this.createToolbarButtonsSubdiv();
         this.toolbarYear = this.createToolbarButtonsYear();
