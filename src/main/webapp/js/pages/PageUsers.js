@@ -6,7 +6,7 @@ import Button from '../components/Button.js';
 import Toolbar from '../components/Toolbar.js';
 import ModalWindow from '../components/ModalWindow.js';
 import ValidationForm from '../components/ValidationForm.js';
-import {URL_BACKEND, URL_SUBDIVISION, URL_USERS} from '../globalVariables.js';
+import {URL_BACKEND, URL_SUBDIVISION, URL_ADMIN, URL_USERS, URL_USERS_CONSOLE} from '../globalVariables.js';
 
 export default class PageUsers {
 
@@ -148,7 +148,7 @@ export default class PageUsers {
 
         usr.subdivisionId = usr.subdivision;
 
-        const urlSaveUser = new URL (URL_USERS + idForEdit, URL_BACKEND);
+        const urlSaveUser = new URL ('/user_console/signup' + idForEdit, URL_BACKEND);
         try {
             const result = await fetchJson( urlSaveUser, {
                 method: usr.id ? 'PATCH' : 'POST',
@@ -176,8 +176,9 @@ export default class PageUsers {
         }
     }
 
-    async deleteData (usrId) {        
-        const urlDeleteUser = new URL (URL_USERS + '/' + usrId, URL_BACKEND);
+    async deleteData (usrId) {
+        //ToDo
+        const urlDeleteUser = new URL ('/admin_console/delete/' + usrId, URL_BACKEND);
 
         try {
             const result = await fetchJson( urlDeleteUser, {
@@ -221,7 +222,7 @@ export default class PageUsers {
             },
             {
                 title: 'Логин',
-                formatedfield: (usr) => { return `${usr.login}` },
+                formatedfield: (usr) => { return `${usr.username}` },
             },
             {
                 title: 'Подразделение',

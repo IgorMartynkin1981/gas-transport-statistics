@@ -18,5 +18,6 @@ public class InfoUserDto {
     @Email(groups = {Create.class})
     private String email;
     private String username;
+    private String password;
     private Subdivision subdivision;
 }

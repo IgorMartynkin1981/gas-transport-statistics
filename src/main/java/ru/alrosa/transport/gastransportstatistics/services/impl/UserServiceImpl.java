@@ -1,15 +1,14 @@
 package ru.alrosa.transport.gastransportstatistics.services.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.alrosa.transport.gastransportstatistics.dto.InfoUserDto;
 import ru.alrosa.transport.gastransportstatistics.dto.UserAuthentication;
 import ru.alrosa.transport.gastransportstatistics.dto.UserMapper;
 import ru.alrosa.transport.gastransportstatistics.entity.Role;
-import ru.alrosa.transport.gastransportstatistics.entity.enums.Status;
 import ru.alrosa.transport.gastransportstatistics.entity.Subdivision;
 import ru.alrosa.transport.gastransportstatistics.entity.User;
+import ru.alrosa.transport.gastransportstatistics.entity.enums.Status;
 import ru.alrosa.transport.gastransportstatistics.exception.DataNotFound;
 import ru.alrosa.transport.gastransportstatistics.repositories.RoleRepository;
 import ru.alrosa.transport.gastransportstatistics.repositories.SubdivisionRepository;
@@ -34,19 +33,13 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final SubdivisionRepository subdivisionRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
-                           RoleRepository roleRepository,
-                           SubdivisionRepository subdivisionRepository,
-                           PasswordEncoder passwordEncoder) {
+                           SubdivisionRepository subdivisionRepository) {
         this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
         this.subdivisionRepository = subdivisionRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -70,12 +63,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public InfoUserDto createUser(UserAuthentication userAuthentication) {
-        Role roleUser = roleRepository.findByName("ROLE_USER");
-        List<Role> userRoles = new ArrayList<>();
-        userRoles.add(roleUser);
-
-        userAuthentication.setPassword(passwordEncoder.encode(userAuthentication.getPassword()));
-        userAuthentication.setRoles(userRoles);
         userAuthentication.setCreated(LocalDateTime.now());
         userAuthentication.setUpdated(LocalDateTime.now());
         userAuthentication.setStatus(Status.ACTIVE);
@@ -143,7 +130,6 @@ public class UserServiceImpl implements UserService {
         if (user.getFirstName() != null) userFromData.setFirstName(user.getFirstName());
         if (user.getLastName() != null) userFromData.setLastName(user.getLastName());
         if (user.getEmail() != null) userFromData.setEmail(user.getEmail());
-        if (user.getPassword() != null) userFromData.setPassword(passwordEncoder.encode(user.getPassword()));
         if (user.getSubdivision() != null) userFromData.setSubdivision(user.getSubdivision());
         if (user.getStatus() != null) userFromData.setStatus(user.getStatus());
 
